@@ -9,11 +9,9 @@ export const SITE = {
 
 export const NAV_LINKS = [
   { label: "Inicio", href: "#hero" },
-  { label: "Nueva Etapa", href: "#nueva-etapa" },
   { label: "¿Qué es ACIA?", href: "#pilares" },
   { label: "Afiliados", href: "#valor" },
   { label: "Eventos", href: "#eventos" },
-  { label: "Internacional", href: "#internacional" },
   { label: "Gobernanza", href: "#gobernanza" },
 ] as const;
 
@@ -23,7 +21,7 @@ export const HERO = {
     "Articulamos el ecosistema de inteligencia artificial en Colombia para impulsar desarrollo, competitividad y gobernanza responsable.",
   cta: [
     { label: "Afíliate a ACIA", href: "#cta", variant: "default" as const },
-    { label: "Conoce la nueva visión", href: "#nueva-etapa", variant: "secondary" as const },
+    { label: "Conoce la nueva visión", href: "#pilares", variant: "secondary" as const },
     { label: "Oportunidades y eventos", href: "#eventos", variant: "outline" as const },
   ],
   footer: "Donde la IA se convierte en desarrollo.",
@@ -32,17 +30,13 @@ export const HERO = {
 export const NEW_STAGE = {
   title: "Una nueva etapa para la IA en Colombia",
   intro:
-    "La inteligencia artificial está redefiniendo industrias, economías y gobiernos. Colombia necesita una asociación fuerte, técnica y articuladora.",
-  subtitle:
-    "La ACIA inicia una etapa de fortalecimiento institucional orientada a:",
+    "Colombia necesita una asociación fuerte, técnica y articuladora. La ACIA inicia su fortalecimiento institucional.",
   points: [
-    "Generar más oportunidades para sus afiliados",
-    "Conectar empresas, talento y academia",
-    "Impulsar proyectos estratégicos de impacto",
-    "Promover una IA responsable y centrada en el ser humano",
+    "Más oportunidades para afiliados",
+    "Conexión empresa, talento y academia",
+    "Proyectos estratégicos de impacto",
+    "IA responsable y centrada en el ser humano",
   ],
-  closing:
-    "Este es el nuevo comienzo de la Asociación Colombiana de Inteligencia Artificial.",
 } as const;
 
 export const PILLARS = [

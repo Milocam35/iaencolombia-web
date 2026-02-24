@@ -30,8 +30,8 @@ iaencolombia-web/
 │   │   ├── LOGO ACIA RECTANGULAR FONDO AZUL OSCURO.png
 │   │   ├── LOGO ACIA RECTANGULAR FONDO BLANCO.png
 │   │   ├── LOGO ACIA TRANSPARENTE PARA FONDO AZUL OSCURO.png  # Footer
-│   │   └── LOGO ACIA TRANSPARENTE PARA FONDO BLANCO.png
-│   └── sections/                     # Imágenes de secciones
+│   │   └── LOGO ACIA TRANSPARENTE PARA FONDO BLANCO.png       # Hero
+│   └── sections/                     # Imágenes de secciones (WebP)
 │       ├── NewStage.webp
 │       ├── Gobernanza.webp
 │       ├── Ecosistema.webp
@@ -39,8 +39,7 @@ iaencolombia-web/
 │       ├── Convocatoria.webp
 │       ├── Eventos.webp
 │       ├── Espacio_trabajo.webp
-│       ├── International.webp
-│       └── Ball.webp
+│       └── International.webp
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx                # Root layout, metadatos SEO, fuentes
@@ -51,13 +50,11 @@ iaencolombia-web/
 │   │   │   ├── Header.tsx            # Navegación fija, logo animado
 │   │   │   └── Footer.tsx            # Footer institucional oscuro
 │   │   ├── sections/
-│   │   │   ├── HeroSection.tsx       # Hero principal con CTAs
-│   │   │   ├── NewStageSection.tsx   # "Una nueva etapa para la IA en Colombia"
+│   │   │   ├── HeroSection.tsx       # Hero unificado: logo, título, imagen + nueva etapa, CTAs
 │   │   │   ├── PillarsSection.tsx    # Carrusel de los 3 pilares de ACIA
 │   │   │   ├── ValueSection.tsx      # Beneficios afiliados (terminal typewriter)
 │   │   │   ├── EventsSection.tsx     # Tarjetas de eventos con imágenes
-│   │   │   ├── InternationalSection.tsx  # Aliados internacionales (marquee)
-│   │   │   ├── GovernanceSection.tsx # Gobernanza responsable, rejilla tipográfica
+│   │   │   ├── GovernanceSection.tsx  # Internacional (marquee aliados) + Gobernanza (principios)
 │   │   │   └── CTASection.tsx        # Llamado a la acción final
 │   │   └── ui/
 │   │       ├── Button.tsx            # Variantes CVA: default, secondary, outline, ghost
@@ -66,7 +63,7 @@ iaencolombia-web/
 │   │       ├── FloatingDots.tsx      # Fondo de puntos flotantes animados (Canvas)
 │   │       └── CircuitPattern.tsx    # Fondo de circuito electrónico (Canvas)
 │   ├── lib/
-│   │   ├── cn.ts                     # Utilidad: clsx + tailwind-merge
+│   │   ├── utils.ts                  # Utilidad: clsx + tailwind-merge (cn)
 │   │   └── constants.ts              # Todo el contenido textual del sitio
 │   └── types/                        # Tipos TypeScript compartidos
 └── CLAUDE.md                         # Guía de desarrollo e identidad de marca
@@ -106,14 +103,12 @@ iaencolombia-web/
 | Sección | ID | Descripción |
 |---|---|---|
 | Header | — | Navegación fija. Logo GIF animado. Scroll activo. |
-| Hero | `#hero` | Título principal, subtítulo y 3 CTAs. |
-| Nueva Etapa | `#nueva-etapa` | Imagen + lista de objetivos estratégicos. |
-| Qué es ACIA | `#pilares` | Carrusel de los 3 pilares: Gobernanza, Ecosistema, Proyectos. Auto-avance cada 6s. |
-| Afiliados | `#valor` | Terminal con efecto typewriter. Lista de beneficios de afiliación. |
-| Eventos | `#eventos` | 4 tarjetas con imagen de cabecera: Convocatorias, Eventos, Mesas técnicas, Internacional. |
-| Internacional | `#internacional` | Marquee infinito de logos de aliados. Fondo CircuitPattern. |
-| Gobernanza | `#gobernanza` | Rejilla tipográfica 2×2 de principios (01–04). Imagen Ball. Fondo CircuitPattern. |
-| Afíliate | `#cta` | CTA final con dos botones. Fondo CircuitPattern. |
+| Hero | `#hero` | Logo centrado, título, badge "Nueva etapa 2026". Split: imagen NewStage + texto nueva etapa + CTAs. Fondo claro con FloatingDots. |
+| Qué es ACIA | `#pilares` | Carrusel de los 3 pilares: Gobernanza, Ecosistema, Proyectos. Auto-avance cada 6s. Fondo claro con FloatingDots. |
+| Afiliados | `#valor` | Terminal con efecto typewriter. Lista de beneficios de afiliación. Fondo oscuro con CircuitPattern. |
+| Eventos | `#eventos` | 4 tarjetas con imagen de cabecera: Convocatorias, Eventos, Mesas técnicas, Internacional. Fondo claro con FloatingDots. |
+| Gobernanza | `#gobernanza` | Proyección internacional (marquee aliados) + divider + Gobernanza responsable (principios 2×2). Fondo oscuro con CircuitPattern. |
+| Afíliate | `#cta` | CTA final con dos botones. Fondo oscuro con CircuitPattern. |
 | Footer | — | Logo ACIA, columnas de navegación, información de contacto. Fondo oscuro. |
 
 ---
@@ -130,10 +125,10 @@ Variantes via CVA: `default` (azul primario), `secondary` (azul claro), `outline
 Envuelve secciones con `py-24 sm:py-32`. Animación `fadeUp` con `useInView` de Framer Motion. Soporte para fondos: `"white"` | `"surface"` | `"dark"`.
 
 ### `FloatingDots`
-Canvas API. Genera 30 puntos animados con trayectorias flotantes aleatorias. Colores ACIA: `#4EC7F0` y `#041D77`. Usado en PillarsSection y EventsSection.
+Canvas API. Genera puntos animados con trayectorias flotantes aleatorias. Colores ACIA: `#4EC7F0` y `#041D77`. Optimizado con IntersectionObserver (pausa fuera de viewport) y throttle a ~30fps. Usado en HeroSection, PillarsSection y EventsSection.
 
 ### `CircuitPattern`
-Canvas API. Dibuja nodos y trazos de circuito electrónico cubriendo toda la sección padre. Detecta el contenedor con `closest("section") ?? closest("footer")`. Usado en ValueSection, InternationalSection, GovernanceSection y CTASection.
+Canvas API. Dibuja nodos y trazos de circuito electrónico cubriendo toda la sección padre. Detecta el contenedor con `closest("section") ?? closest("footer")`. Optimizado con IntersectionObserver y throttle a ~30fps. Usado en ValueSection, GovernanceSection y CTASection.
 
 ---
 
@@ -144,9 +139,9 @@ Canvas API. Dibuja nodos y trazos de circuito electrónico cubriendo toda la sec
 | Fade-up en scroll | Framer Motion `useInView` | Todas las secciones |
 | Carrusel de pilares | `AnimatePresence` + `slideVariants` | PillarsSection |
 | Typewriter terminal | Intervalo JS + `useInView` | ValueSection |
-| Marquee infinito | `motion.div` con `animate={{ x: ["0%", "-50%"] }}` | InternationalSection |
-| Puntos flotantes | Canvas API + `requestAnimationFrame` | PillarsSection, EventsSection |
-| Circuito electrónico | Canvas API + `requestAnimationFrame` | ValueSection, InternationalSection, GovernanceSection, CTASection |
+| Marquee infinito | `motion.div` con `animate={{ x: ["0%", "-50%"] }}` | GovernanceSection (aliados) |
+| Puntos flotantes | Canvas API + `requestAnimationFrame` | HeroSection, PillarsSection, EventsSection |
+| Circuito electrónico | Canvas API + `requestAnimationFrame` | ValueSection, GovernanceSection, CTASection |
 
 > **Nota Tailwind v4:** Los `@keyframes` deben declararse **fuera** del bloque `@theme {}` para funcionar correctamente a nivel global.
 
@@ -190,9 +185,10 @@ npm run lint
 ## Convenciones de Desarrollo
 
 - **Contenido textual:** todo vive en [`src/lib/constants.ts`](src/lib/constants.ts). No hardcodear strings en componentes.
-- **Imágenes:** logos en `public/logos/`, fotos de secciones en `public/sections/`.
+- **Imágenes:** logos en `public/logos/`, fotos de secciones en `public/sections/` (formato WebP).
 - **GIFs:** usar `unoptimized` en `next/image` para preservar la animación.
 - **Idioma:** el sitio es **español únicamente** (`lang="es"`). No agregar inglés.
 - **Tailwind:** no usar `tailwind.config.ts`. Toda la configuración es CSS-first en `globals.css` con `@theme`.
 - **`"use client"`:** solo agregar cuando el componente usa estado (`useState`), efectos (`useEffect`) o eventos del navegador. Componentes de solo presentación no lo necesitan.
 - **Imágenes del logo:** respetar las variantes según el fondo (oscuro / blanco). Ver sección de Identidad Visual.
+- **Canvas animations:** usar IntersectionObserver para pausar cuando están fuera del viewport. Throttle a ~30fps.

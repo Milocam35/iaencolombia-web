@@ -9,7 +9,7 @@ export function CTASection() {
   return (
     <section
       id="cta"
-      className="relative overflow-hidden bg-dark px-4 py-32 sm:px-6 lg:px-8"
+      className="relative overflow-hidden bg-dark px-4 pt-16 pb-16 sm:px-6 lg:px-8"
     >
       <CircuitPattern />
 
@@ -53,7 +53,7 @@ export function CTASection() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="mt-16 flex items-center justify-center gap-3"
+          className="mt-24 flex items-center justify-center gap-3"
         >
           <div className="h-px w-16 bg-accent/30" />
           <p className="text-xs font-medium tracking-widest text-accent/70 uppercase">

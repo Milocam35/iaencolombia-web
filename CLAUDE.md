@@ -10,12 +10,27 @@
 
 ## Project Structure
 - `src/app/` — Pages and layout (App Router)
-- `src/components/ui/` — Reusable UI components (Button, Container, SectionWrapper, FloatingDots)
+- `src/components/ui/` — Reusable UI components (Button, Container, SectionWrapper, FloatingDots, CircuitPattern)
 - `src/components/layout/` — Header, Footer
-- `src/components/sections/` — Landing page sections (Hero, NewStage, Pillars, Value, Events, International, Governance, CTA)
-- `src/lib/` — Utilities (cn) and constants (all text content)
+- `src/components/sections/` — Landing page sections (Hero, Pillars, Value, Events, Governance, CTA)
+- `src/lib/` — Utilities (utils.ts with cn) and constants (all text content)
 - `src/types/` — TypeScript types
-- `public/` — Static assets (ACIA-GIFT.gif logo)
+- `public/logos/` — Logo variants (GIF animado, PNG circular, rectangular, transparente)
+- `public/sections/` — Section images (WebP format)
+
+## Sections (order in page.tsx)
+1. **HeroSection** — Unified hero: centered logo + title, split layout (NewStage image + nueva etapa text), CTAs
+2. **PillarsSection** — Carousel of 3 ACIA pillars with auto-advance
+3. **ValueSection** — Terminal typewriter effect for affiliate benefits
+4. **EventsSection** — Event cards with images
+5. **GovernanceSection** — Merged International (marquee allies) + Governance (principles grid). Dark bg with CircuitPattern
+6. **CTASection** — Final CTA with dark bg and CircuitPattern
+
+## Performance Optimizations
+- Canvas components (FloatingDots, CircuitPattern) use IntersectionObserver to pause when off-screen
+- Canvas animations throttled to ~30fps
+- All section images in WebP format
+- `priority` on above-the-fold images (logo, NewStage.webp)
 
 ---
 
@@ -66,5 +81,7 @@
 La marca transmite: institucionalidad, confianza, tecnología estructurada, formalidad académica.
 El contraste azul profundo + azul claro + blanco comunica: autoridad + innovación, ciencia + futuro, base sólida + expansión.
 
-### Archivo del Logo
-- `public/ACIA-GIFT.gif` — Logo animado GIF (usar `unoptimized` en next/image para preservar animación)
+### Archivos del Logo
+- `public/logos/ACIA-GIFT.gif` — Logo animado GIF (usar `unoptimized` en next/image para preservar animación). Usado en Header.
+- `public/logos/LOGO ACIA TRANSPARENTE PARA FONDO BLANCO.png` — Logo estático para fondo claro. Usado en HeroSection.
+- `public/logos/LOGO ACIA TRANSPARENTE PARA FONDO AZUL OSCURO.png` — Logo estático para fondo oscuro. Usado en Footer.

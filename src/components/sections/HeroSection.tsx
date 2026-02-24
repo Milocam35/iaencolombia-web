@@ -1,146 +1,144 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { FloatingDots } from "@/components/ui/FloatingDots";
-import { HERO } from "@/lib/constants";
+import { HERO, NEW_STAGE } from "@/lib/constants";
 
-function TypewriterText({
-  text,
-  delay = 0,
-  speed = 40,
-  className,
-}: {
-  text: string;
-  delay?: number;
-  speed?: number;
-  className?: string;
-}) {
-  const [displayed, setDisplayed] = useState("");
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setStarted(true), delay);
-    return () => clearTimeout(timeout);
-  }, [delay]);
-
-  useEffect(() => {
-    if (!started) return;
-    if (displayed.length >= text.length) return;
-
-    const timeout = setTimeout(() => {
-      setDisplayed(text.slice(0, displayed.length + 1));
-    }, speed);
-    return () => clearTimeout(timeout);
-  }, [started, displayed, text, speed]);
-
-  return (
-    <span className={className}>
-      {displayed}
-      {displayed.length < text.length && (
-        <span className="inline-block w-[2px] h-[1em] bg-primary align-middle animate-pulse ml-0.5" />
-      )}
-    </span>
-  );
-}
+const ease = [0.16, 1, 0.3, 1] as const;
 
 export function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 pt-20 pb-16 sm:px-6 lg:px-8"
+      className="relativ bg-surface flex min-h-screen flex-col overflow-hidden px-4 pt-24 pb-6 sm:px-6 lg:px-8"
     >
-      {/* Animated floating dots background */}
+      {/* Background */}
       <FloatingDots />
-
-      {/* Soft radial gradients */}
       <div className="pointer-events-none absolute inset-0 gradient-mesh" />
+      <div className="pointer-events-none absolute -top-40 -right-40 size-[520px] rounded-full bg-primary/5 blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-40 -left-40 size-[440px] rounded-full bg-accent/4 blur-[100px]" />
 
-      {/* Soft blue orbs */}
-      <div className="pointer-events-none absolute -top-32 -right-32 size-[500px] rounded-full bg-primary/5 blur-[100px]" />
-      <div className="pointer-events-none absolute -bottom-32 -left-32 size-[400px] rounded-full bg-accent/4 blur-[80px]" />
-
-      <div className="relative mx-auto max-w-4xl text-center">
-        {/* Badge */}
+      {/* ── Brand block — centered, dominant ── */}
+      <div className="relative text-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-medium text-muted-foreground shadow-sm"
-        >
-          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          Nueva etapa institucional 2026
-        </motion.div>
-
-        {/* Logo — large, transparent background blends with white */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
+          initial={{ opacity: 0, scale: 0.88 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-4"
+          transition={{ duration: 0.7, ease }}
         >
           <Image
             src="/logos/LOGO ACIA TRANSPARENTE PARA FONDO BLANCO.png"
-            alt="ACIA — Asociación Colombiana de Inteligencia Artificial"
-            width={320}
-            height={320}
+            alt="ACIA"
+            width={280}
+            height={280}
             className="mx-auto"
             priority
           />
         </motion.div>
 
-        {/* Title — typewriter effect, smaller than logo */}
-        <h1 className="text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl lg:text-4xl">
-          <TypewriterText
-            text="Asociación Colombiana de "
-            delay={600}
-            speed={45}
-          />
-          <TypewriterText
-            text="Inteligencia Artificial"
-            delay={1800}
-            speed={45}
-            className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent"
-          />
-        </h1>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 3.2 }}
-          className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg"
-        >
-          {HERO.subtitle}
-        </motion.p>
-
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 3.5 }}
-          className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
+          transition={{ duration: 0.6, delay: 0.25, ease }}
         >
-          {HERO.cta.map((btn) => (
-            <Button key={btn.label} href={btn.href} variant={btn.variant} size="lg">
-              {btn.label}
-            </Button>
-          ))}
+          <div className="m-5 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1 text-[11px] font-medium text-muted-foreground shadow-sm">
+            <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
+            Nueva etapa 2026
+          </div>
+          <h1 className="mx-auto max-w-2xl text-2xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-3xl lg:text-4xl">
+            Asociación Colombiana de{" "}
+            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              Inteligencia Artificial
+            </span>
+          </h1>
         </motion.div>
       </div>
 
-      {/* Bottom tagline */}
+      {/* ── Split: Image + Nueva etapa ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 28 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.5, ease }}
+        className="relative mx-auto mt-8 grid w-full max-w-screen-xl flex-1 grid-cols-1 items-center gap-6 sm:mt-10 lg:grid-cols-2 lg:gap-12"
+      >
+        {/* Image */}
+        <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-2xl shadow-2xl shadow-primary/8 lg:max-w-none">
+          <Image
+            src="/sections/NewStage.webp"
+            alt="Nueva etapa — IA en Colombia"
+            width={600}
+            height={500}
+            className="size-full object-cover"
+            priority
+          />
+          <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 to-transparent" />
+        </div>
+
+        {/* Text + CTAs */}
+        <div className="flex flex-col justify-center">
+          <h2 className="text-2xl font-extrabold leading-tight tracking-tight text-foreground sm:text-3xl lg:text-4xl">
+            {NEW_STAGE.title.split("IA").map((part, i, arr) =>
+              i < arr.length - 1 ? (
+                <span key={i}>
+                  {part}<span className="text-accent">IA</span>
+                </span>
+              ) : (
+                <span key={i}>{part}</span>
+              ),
+            )}
+          </h2>
+
+          <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
+            {NEW_STAGE.intro}
+          </p>
+
+          <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+            {NEW_STAGE.points.map((point) => (
+              <li
+                key={point}
+                className="flex items-center gap-2 text-sm text-foreground"
+              >
+                <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-accent/15">
+                  <svg
+                    className="size-2.5 text-accent"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={3.5}
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </span>
+                {point}
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            {HERO.cta.map((btn) => (
+              <Button key={btn.label} href={btn.href} variant={btn.variant} size="default">
+                {btn.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Tagline ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, delay: 4 }}
-        className="absolute bottom-8 flex items-center gap-3"
+        transition={{ duration: 0.8, delay: 1 }}
+        className="relative mt-auto flex items-center justify-center gap-3 pt-10"
       >
-        <div className="h-px w-12 bg-border" />
-        <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+        <div className="h-px w-10 bg-border" />
+        <p className="text-[10px] font-medium tracking-widest text-muted-foreground/60 uppercase">
           {HERO.footer}
         </p>
-        <div className="h-px w-12 bg-border" />
+        <div className="h-px w-10 bg-border" />
       </motion.div>
     </section>
   );

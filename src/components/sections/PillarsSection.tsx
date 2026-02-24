@@ -40,7 +40,7 @@ export function PillarsSection() {
   const pillar = PILLARS[current];
 
   return (
-    <SectionWrapper id="pilares" className="overflow-hidden bg-surface">
+    <SectionWrapper id="pilares" className="overflow-hidden bg-surface !pt-8 sm:!pt-12">
       <FloatingDots />
       <div className="relative z-10 text-center">
         <p className="text-sm font-semibold tracking-wide text-primary uppercase">

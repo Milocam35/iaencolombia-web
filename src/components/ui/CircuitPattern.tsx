@@ -21,32 +21,26 @@ function createTrace(w: number, h: number, forceEdge?: number): CircuitTrace {
   let horizontal: boolean;
 
   switch (edgeIndex) {
-    case 0: // left
-      x = 0; y = Math.random() * h; horizontal = true; break;
-    case 1: // right
-      x = w; y = Math.random() * h; horizontal = true; break;
-    case 2: // top
-      x = Math.random() * w; y = 0; horizontal = false; break;
-    default: // bottom
-      x = Math.random() * w; y = h; horizontal = false; break;
+    case 0: x = 0; y = Math.random() * h; horizontal = true; break;
+    case 1: x = w; y = Math.random() * h; horizontal = true; break;
+    case 2: x = Math.random() * w; y = 0; horizontal = false; break;
+    default: x = Math.random() * w; y = h; horizontal = false; break;
   }
 
   const segments: { x: number; y: number }[] = [{ x, y }];
-  const numSegments = 5 + Math.floor(Math.random() * 4);
+  const numSegments = 4 + Math.floor(Math.random() * 3);
 
   for (let i = 0; i < numSegments; i++) {
     const prev = segments[segments.length - 1];
     const step = 40 + Math.random() * 100;
 
     if (horizontal) {
-      // Move toward center horizontally
       const dirX = prev.x < w / 2 ? 1 : -1;
       segments.push({
         x: Math.max(0, Math.min(w, prev.x + step * dirX)),
         y: prev.y,
       });
     } else {
-      // Move toward center vertically
       const dirY = prev.y < h / 2 ? 1 : -1;
       segments.push({
         x: prev.x,
@@ -154,8 +148,9 @@ export function CircuitPattern() {
 
     let animationId: number = 0;
     let traces: CircuitTrace[] = [];
+    let isVisible = false;
+    let lastTime = 0;
 
-    // Find the closest positioned ancestor (section, footer, etc.)
     const container = canvas.closest("section") ?? canvas.closest("footer") ?? canvas.parentElement;
 
     const getSize = () => {
@@ -175,16 +170,28 @@ export function CircuitPattern() {
 
     const init = () => {
       const { w, h } = getSize();
-      // Distribute evenly: ~3-4 traces per edge
-      const perEdge = 3;
+      // 2 traces per edge = 8 total (reduced from 12)
+      const perEdge = 2;
       traces = Array.from({ length: perEdge * 4 }, (_, i) => {
         const trace = createTrace(w, h, i);
-        trace.progress = Math.random(); // stagger
+        trace.progress = Math.random();
         return trace;
       });
     };
 
-    const draw = () => {
+    const draw = (timestamp: number) => {
+      if (!isVisible) {
+        animationId = 0;
+        return;
+      }
+
+      // Throttle to ~30fps
+      if (timestamp - lastTime < 33) {
+        animationId = requestAnimationFrame(draw);
+        return;
+      }
+      lastTime = timestamp;
+
       const { w, h } = getSize();
       ctx.clearRect(0, 0, w, h);
 
@@ -204,26 +211,41 @@ export function CircuitPattern() {
       animationId = requestAnimationFrame(draw);
     };
 
-    resize();
-    init();
-    draw();
+    // Pause when section scrolls out of viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        isVisible = entries[0].isIntersecting;
+        if (isVisible && animationId === 0) {
+          animationId = requestAnimationFrame(draw);
+        }
+      },
+      { threshold: 0.01 },
+    );
+    if (container) observer.observe(container);
 
     const onResize = () => { resize(); init(); };
-    window.addEventListener("resize", onResize);
+    window.addEventListener("resize", onResize, { passive: true });
 
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    resize();
+    init();
+
     if (motionQuery.matches) {
-      cancelAnimationFrame(animationId);
       const s = getSize();
       ctx.clearRect(0, 0, s.w, s.h);
       for (const trace of traces) {
         trace.progress = 1;
         drawTrace(ctx, { ...trace, opacity: trace.opacity * 0.5 });
       }
+    } else {
+      isVisible = true;
+      animationId = requestAnimationFrame(draw);
     }
 
     return () => {
       cancelAnimationFrame(animationId);
+      observer.disconnect();
       window.removeEventListener("resize", onResize);
     };
   }, []);
