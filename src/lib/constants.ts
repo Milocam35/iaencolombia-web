@@ -45,7 +45,7 @@ export const PILLARS = [
     title: "Pensamiento y Gobernanza",
     description:
       "Promovemos principios de ética, transparencia y reducción de sesgos en sistemas de IA.",
-    image: "/sections/Gobernanza.webp",
+    image: "/sections/Gobernanza1.webp",
   },
   {
     icon: "handshake" as const,

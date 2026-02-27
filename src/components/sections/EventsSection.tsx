@@ -8,7 +8,7 @@ import { EVENTS } from "@/lib/constants";
 
 const categoryData = [
   {
-    image: "/sections/Convocatoria.webp",
+    image: "/sections/Convocatorias1.webp",
     description: "Participa en convocatorias exclusivas para afiliados.",
   },
   {
@@ -16,7 +16,7 @@ const categoryData = [
     description: "Conferencias, talleres y encuentros del ecosistema.",
   },
   {
-    image: "/sections/Espacio_trabajo.webp",
+    image: "/sections/Mesas.webp",
     description: "Espacios de trabajo técnico y análisis sectorial.",
   },
   {

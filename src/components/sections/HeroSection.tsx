@@ -12,7 +12,7 @@ export function HeroSection() {
   return (
     <section
       id="hero"
-      className="relativ bg-surface flex min-h-screen flex-col overflow-hidden px-4 pt-24 pb-6 sm:px-6 lg:px-8"
+      className="relative bg-surface flex min-h-screen flex-col overflow-hidden px-4 pt-24 pb-6 sm:px-6 lg:px-8"
     >
       {/* Background */}
       <FloatingDots />
@@ -77,7 +77,7 @@ export function HeroSection() {
         </div>
 
         {/* Text + CTAs */}
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col items-center justify-center text-center lg:items-start lg:text-left">
           <h2 className="text-2xl font-extrabold leading-tight tracking-tight text-foreground sm:text-3xl lg:text-4xl">
             {NEW_STAGE.title.split("IA").map((part, i, arr) =>
               i < arr.length - 1 ? (
@@ -117,7 +117,7 @@ export function HeroSection() {
             ))}
           </ul>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:items-start">
             {HERO.cta.map((btn) => (
               <Button key={btn.label} href={btn.href} variant={btn.variant} size="default">
                 {btn.label}
