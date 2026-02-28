@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     icon: "/logos/LOGO ACIA CIRCULAR FONDO AZUL OSCURO.png",
     apple: "/logos/LOGO ACIA CIRCULAR FONDO AZUL OSCURO.png",
   },
-  title: "ACIA - Asociación Colombiana de Inteligencia Artificial",
+  title: "Asociación Colombiana de Inteligencia Artificial",
   description:
     "Articulamos el ecosistema de inteligencia artificial en Colombia para impulsar desarrollo, competitividad y gobernanza responsable.",
   keywords: [
