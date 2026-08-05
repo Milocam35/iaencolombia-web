@@ -81,6 +81,14 @@ export const VALUE_PROPOSITION = {
 
 export const EVENTS = {
   title: "Conectando talento y oportunidades en IA.",
+  featured: {
+    eyebrow: "Alianza ACIA × América Digital",
+    title: "Un beneficio especial para nuestra comunidad afiliada",
+    description:
+      "Gracias a la alianza entre ACIA y América Digital, nuestros afiliados podrán acceder a un 40 % de descuento en delegación para asistir al 11.º Congreso Latinoamericano de IA, Tecnología y Negocios.",
+    details: "9 y 10 de septiembre de 2026 · Espacio Riesco, Santiago de Chile",
+    href: "https://congreso.america-digital.com/",
+  },
   categories: [
     "Convocatorias activas",
     "Próximos eventos",

@@ -39,7 +39,85 @@ export function EventsSection() {
         </h2>
       </div>
 
-      <div className="relative z-10 mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <motion.article
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ duration: 0.55 }}
+        className="relative z-10 mt-12 overflow-hidden rounded-3xl bg-dark shadow-2xl shadow-primary/10 ring-1 ring-white/10"
+      >
+        <div className="pointer-events-none absolute -top-32 -left-24 size-80 rounded-full bg-accent/15 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 -bottom-32 size-80 rounded-full bg-primary/50 blur-3xl" />
+
+        <div className="relative grid gap-8 p-5 sm:p-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:gap-10 lg:p-10">
+          <div className="flex flex-col items-start">
+            <div className="mb-6 h-px w-16 bg-accent" />
+            <p className="text-xs font-bold tracking-[0.18em] text-accent uppercase">
+              {EVENTS.featured.eyebrow}
+            </p>
+            <h3 className="mt-4 max-w-lg text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+              {EVENTS.featured.title}
+            </h3>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-white/75 sm:text-base">
+              {EVENTS.featured.description}
+            </p>
+            <p className="mt-5 border-l-2 border-accent pl-4 text-sm font-semibold leading-6 text-white">
+              {EVENTS.featured.details}
+            </p>
+            <a
+              href={EVENTS.featured.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-7 inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-bold text-dark transition-all duration-200 hover:-translate-y-0.5 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-dark"
+            >
+              Conoce el Congreso
+              <svg className="size-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </a>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:gap-5">
+            {[
+              {
+                src: "/events/america-digital-invitacion.jpg",
+                alt: "Invitación de ACIA al Congreso Latinoamericano América Digital 2026",
+              },
+              {
+                src: "/events/america-digital-beneficio.jpg",
+                alt: "Beneficio del 40 por ciento para delegaciones afiliadas a ACIA",
+              },
+            ].map((piece, index) => (
+              <motion.figure
+                key={piece.src}
+                initial={{ opacity: 0, x: 18 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: 0.15 + index * 0.12 }}
+                className={`relative aspect-[4/5] overflow-hidden rounded-xl bg-white/5 shadow-xl ring-1 ring-white/15 ${
+                  index === 1 ? "mt-6 sm:mt-10" : "mb-6 sm:mb-10"
+                }`}
+              >
+                <Image
+                  src={piece.src}
+                  alt={piece.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 45vw, 28vw"
+                />
+              </motion.figure>
+            ))}
+          </div>
+        </div>
+      </motion.article>
+
+      <div className="relative z-10 mt-16 text-center">
+        <p className="text-xs font-bold tracking-[0.18em] text-primary uppercase">
+          Más oportunidades ACIA
+        </p>
+      </div>
+
+      <div className="relative z-10 mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {EVENTS.categories.map((category, i) => (
           <motion.div
             key={category}
