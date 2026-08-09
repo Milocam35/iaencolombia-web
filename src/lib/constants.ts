@@ -76,7 +76,7 @@ export const VALUE_PROPOSITION = {
     "Acceso a espacios binacionales e internacionales",
     "Informes técnicos y análisis especializados",
   ],
-  cta: { label: "Conoce los beneficios", href: "#cta" },
+  cta: { label: "Conoce los beneficios", href: "#planes" },
 } as const;
 
 export const EVENTS = {
