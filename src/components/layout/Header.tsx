@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { NAV_LINKS } from "@/lib/constants";
+import { ADMIN_PLATFORM_URL } from "@/lib/config";
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -55,13 +56,23 @@ export function Header() {
             ))}
           </ul>
 
-          {/* CTA desktop */}
-          <a
-            href="#cta"
-            className="hidden cursor-pointer rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-[#031560] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:inline-flex"
-          >
-            Afíliate
-          </a>
+          {/* Desktop actions */}
+          <div className="hidden items-center gap-2 lg:flex">
+            {ADMIN_PLATFORM_URL && (
+              <a
+                href={ADMIN_PLATFORM_URL}
+                className="cursor-pointer rounded-lg border border-primary/20 bg-white/70 px-4 py-2.5 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                Acceso administrativo
+              </a>
+            )}
+            <a
+              href="#cta"
+              className="hidden cursor-pointer rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-[#031560] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:inline-flex"
+            >
+              Afíliate
+            </a>
+          </div>
 
           {/* Mobile hamburger */}
           <button
@@ -111,6 +122,15 @@ export function Header() {
                 </li>
               ))}
               <li className="mt-3 border-t border-border pt-3">
+                {ADMIN_PLATFORM_URL && (
+                  <a
+                    href={ADMIN_PLATFORM_URL}
+                    onClick={() => setMobileOpen(false)}
+                    className="mb-2 block cursor-pointer rounded-lg border border-primary/20 px-4 py-2.5 text-center text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-muted"
+                  >
+                    Acceso administrativo
+                  </a>
+                )}
                 <a
                   href="#cta"
                   onClick={() => setMobileOpen(false)}
