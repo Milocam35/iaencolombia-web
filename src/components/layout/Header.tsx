@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { NAV_LINKS } from "@/lib/constants";
 import { ADMIN_PLATFORM_URL } from "@/lib/config";
@@ -30,7 +31,7 @@ export function Header() {
           aria-label="Navegación principal"
         >
           {/* Logo only */}
-          <a href="#hero" className="cursor-pointer">
+          <Link href="/" className="cursor-pointer">
             <Image
               src="/logos/LOGO ACIA TRANSPARENTE PARA FONDO BLANCO.png"
               alt="ACIA — Asociación Colombiana de Inteligencia Artificial"
@@ -40,7 +41,7 @@ export function Header() {
               className="transition-transform duration-200 hover:scale-105"
               priority
             />
-          </a>
+          </Link>
 
           {/* Desktop nav */}
           <ul className="hidden items-center gap-1 lg:flex">
@@ -67,7 +68,7 @@ export function Header() {
               </a>
             )}
             <a
-              href="#cta"
+              href="/afiliate"
               className="hidden cursor-pointer rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-[#031560] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:inline-flex"
             >
               Afíliate
@@ -132,7 +133,7 @@ export function Header() {
                   </a>
                 )}
                 <a
-                  href="#cta"
+                  href="/afiliate"
                   onClick={() => setMobileOpen(false)}
                   className="block cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-[#031560]"
                 >

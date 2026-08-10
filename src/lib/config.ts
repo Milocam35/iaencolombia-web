@@ -3,3 +3,9 @@ const configuredAdminPlatformUrl =
 
 export const ADMIN_PLATFORM_URL =
   configuredAdminPlatformUrl || "https://admin.iaencolombia.org/login";
+
+const configuredAciaApiUrl = process.env.NEXT_PUBLIC_ACIA_API_URL?.trim();
+
+export const ACIA_API_URL = configuredAciaApiUrl
+  ? configuredAciaApiUrl.replace(/\/$/, "")
+  : null;

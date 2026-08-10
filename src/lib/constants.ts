@@ -8,11 +8,11 @@ export const SITE = {
 } as const;
 
 export const NAV_LINKS = [
-  { label: "Inicio", href: "#hero" },
-  { label: "¿Qué es ACIA?", href: "#pilares" },
-  { label: "Afiliados", href: "#valor" },
-  { label: "Eventos", href: "#eventos" },
-  { label: "Gobernanza", href: "#gobernanza" },
+  { label: "Inicio", href: "/#hero" },
+  { label: "¿Qué es ACIA?", href: "/#pilares" },
+  { label: "Afiliados", href: "/#valor" },
+  { label: "Eventos", href: "/#eventos" },
+  { label: "Gobernanza", href: "/#gobernanza" },
 ] as const;
 
 export const HERO = {
@@ -20,7 +20,7 @@ export const HERO = {
   subtitle:
     "Articulamos el ecosistema de inteligencia artificial en Colombia para impulsar desarrollo, competitividad y gobernanza responsable.",
   cta: [
-    { label: "Afíliate a ACIA", href: "#cta", variant: "default" as const },
+    { label: "Afíliate a ACIA", href: "/afiliate", variant: "default" as const },
     { label: "Conoce la nueva visión", href: "#pilares", variant: "secondary" as const },
     { label: "Oportunidades y eventos", href: "#eventos", variant: "outline" as const },
   ],
@@ -119,7 +119,7 @@ export const GOVERNANCE = {
 export const CTA_FINAL = {
   title: "Fortalezcamos juntos el ecosistema de IA en Colombia.",
   cta: [
-    { label: "Afíliate ahora", href: "#", variant: "default" as const },
+    { label: "Afíliate ahora", href: "/afiliate", variant: "default" as const },
     { label: "Contáctanos", href: "#", variant: "outline" as const },
   ],
   closing: "Donde la IA se convierte en desarrollo.",
