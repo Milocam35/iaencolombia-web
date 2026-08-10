@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { ACIA_API_URL } from "@/lib/config";
+import { AFFILIATION_CONSENT, PRIVACY_POLICY_PATH } from "@/lib/privacyPolicy";
 
 type ProspectType = "person" | "company" | "institution" | "strategic_ally";
 
@@ -87,7 +89,7 @@ export function AffiliationForm({ initialPlan, initialType }: { initialPlan?: st
       {prospectType !== "strategic_ally" && <Field label="Plan de interés" className="mt-5"><select value={planCode} onChange={(event) => setPlanCode(event.target.value)} className={inputClass}><option value="">No estoy seguro todavía</option>{plans.map((plan) => <option key={plan.value} value={plan.value}>{plan.label}</option>)}</select></Field>}
       <Field label="Mensaje" className="mt-5"><textarea name="message" maxLength={2000} rows={4} className={inputClass} placeholder="Cuéntanos brevemente qué esperas encontrar en ACIA." /></Field>
       <div className="absolute -left-[10000px] top-auto size-px overflow-hidden" aria-hidden="true"><label htmlFor="website">Sitio web</label><input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" maxLength={500} /></div>
-      <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl bg-surface p-4 text-sm leading-6 text-muted-foreground"><input name="privacy_accepted" type="checkbox" required className="mt-1 size-4 shrink-0 accent-primary" /><span>He leído y acepto la política de tratamiento de datos personales. <Required /></span></label>
+      <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl bg-surface p-4 text-sm leading-6 text-muted-foreground"><input name="privacy_accepted" type="checkbox" required className="mt-1 size-4 shrink-0 accent-primary" /><span>{AFFILIATION_CONSENT.prefix}{" "}<Link href={PRIVACY_POLICY_PATH} className="font-semibold text-primary underline decoration-accent/60 underline-offset-2 transition hover:text-accent">{AFFILIATION_CONSENT.linkLabel}</Link>{AFFILIATION_CONSENT.suffix} <Required /></span></label>
       {result && <p className={`mt-5 rounded-xl border px-4 py-3 text-sm leading-6 ${result.kind === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-red-200 bg-red-50 text-red-700"}`} role={result.kind === "error" ? "alert" : "status"}>{result.message}</p>}
       <button type="submit" disabled={submitting} className="mt-6 flex h-13 w-full cursor-pointer items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-white shadow-lg shadow-primary/15 transition hover:bg-[#031560] disabled:cursor-not-allowed disabled:opacity-60">{submitting ? <><span className="mr-2 size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />Enviando solicitud…</> : "Enviar mi solicitud"}</button>
       <p className="mt-4 text-center text-xs text-muted-foreground">Solo usaremos estos datos para atender tu interés de vinculación.</p>

@@ -19,6 +19,7 @@ const navColumns = [
       { label: "Internacional", href: "/#internacional" },
       { label: "Gobernanza", href: "/#gobernanza" },
       { label: "Afíliate", href: "/afiliate" },
+      { label: "Política de Tratamiento de Datos", href: "/politica-tratamiento-datos" },
     ],
   },
 ];
