@@ -1,23 +1,24 @@
 import Image from "next/image";
+import Link from "next/link";
 import { SITE } from "@/lib/constants";
 
 const navColumns = [
   {
     title: "Explorar",
     links: [
-      { label: "Inicio", href: "#hero" },
-      { label: "Nueva Etapa", href: "#nueva-etapa" },
-      { label: "¿Qué es ACIA?", href: "#pilares" },
-      { label: "Afiliados", href: "#valor" },
+      { label: "Inicio", href: "/#hero" },
+      { label: "Nueva Etapa", href: "/#nueva-etapa" },
+      { label: "¿Qué es ACIA?", href: "/#pilares" },
+      { label: "Afiliados", href: "/#valor" },
     ],
   },
   {
     title: "Comunidad",
     links: [
-      { label: "Eventos", href: "#eventos" },
-      { label: "Internacional", href: "#internacional" },
-      { label: "Gobernanza", href: "#gobernanza" },
-      { label: "Afíliate", href: "#cta" },
+      { label: "Eventos", href: "/#eventos" },
+      { label: "Internacional", href: "/#internacional" },
+      { label: "Gobernanza", href: "/#gobernanza" },
+      { label: "Afíliate", href: "/afiliate" },
     ],
   },
 ];
@@ -32,7 +33,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           {/* Brand column */}
           <div className="lg:col-span-4">
-            <a href="#hero" className="inline-block">
+            <Link href="/" className="inline-block">
               <Image
                 src="/logos/LOGO ACIA TRANSPARENTE PARA FONDO AZUL OSCURO.png"
                 alt="ACIA"
@@ -40,7 +41,7 @@ export function Footer() {
                 height={70}
                 className="transition-opacity duration-200 hover:opacity-80"
               />
-            </a>
+            </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/50">
               {SITE.description}
             </p>

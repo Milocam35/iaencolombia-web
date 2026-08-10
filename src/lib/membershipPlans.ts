@@ -108,7 +108,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     cta: "Quiero afiliarme",
   },
   {
-    id: "micro-empresa",
+    id: "micro_empresa",
     category: "empresas",
     name: "Micro empresa",
     audience: "1–10 empleados",
@@ -124,7 +124,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     cta: "Quiero afiliarme",
   },
   {
-    id: "pequena-empresa",
+    id: "pequena_empresa",
     category: "empresas",
     name: "Pequeña empresa",
     audience: "11–50 empleados",
@@ -139,7 +139,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     cta: "Quiero afiliarme",
   },
   {
-    id: "mediana-empresa",
+    id: "mediana_empresa",
     category: "empresas",
     name: "Mediana empresa",
     audience: "51–200 empleados",
@@ -154,7 +154,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     cta: "Quiero afiliarme",
   },
   {
-    id: "gran-empresa",
+    id: "gran_empresa",
     category: "empresas",
     name: "Gran empresa",
     audience: "200+ empleados",
@@ -172,7 +172,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     featured: true,
   },
   {
-    id: "institucion-educativa",
+    id: "institucion_educativa",
     category: "instituciones",
     name: "Institución educativa / gremio",
     audience: "Universidad, gremio o cámara de comercio",

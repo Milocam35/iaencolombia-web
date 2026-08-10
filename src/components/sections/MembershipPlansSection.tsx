@@ -103,7 +103,7 @@ function PlanCard({ plan, index }: { plan: MembershipPlan; index: number }) {
           ))}
         </ul>
         <Button
-          href="#cta"
+          href={`/afiliate?plan=${encodeURIComponent(plan.id)}`}
           variant={plan.featured ? "default" : "outline"}
           className="mt-7 w-full"
         >
@@ -254,7 +254,7 @@ export function MembershipPlansSection() {
             {STRATEGIC_ALLY.price}
           </p>
           <Button
-            href="#cta"
+            href="/afiliate?type=strategic_ally"
             variant="outline"
             className="mt-4 border-white/30 text-white hover:border-accent hover:bg-white/10 hover:text-white"
           >

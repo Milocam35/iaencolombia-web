@@ -2,6 +2,11 @@
 
 Sitio web oficial de la **Asociación Colombiana de Inteligencia Artificial** (ACIA), disponible en [iaencolombia.org](https://iaencolombia.org).
 
+## Configuración pública
+
+- `NEXT_PUBLIC_ADMIN_PLATFORM_URL`: URL de acceso a la plataforma administrativa. Tiene como fallback el dominio oficial.
+- `NEXT_PUBLIC_ACIA_API_URL`: URL base pública del backend FastAPI, sin barra final. Es necesaria para enviar el formulario de `/afiliate` y no contiene secretos.
+
 ---
 
 ## Stack Tecnológico
