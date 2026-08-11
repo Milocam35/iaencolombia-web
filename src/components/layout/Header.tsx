@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { NAV_LINKS } from "@/lib/constants";
+import { NAV_GROUPS } from "@/lib/constants";
 import { ADMIN_PLATFORM_URL } from "@/lib/config";
 
 export function Header() {
@@ -45,14 +45,29 @@ export function Header() {
 
           {/* Desktop nav */}
           <ul className="hidden items-center gap-1 lg:flex">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  className="cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            {NAV_GROUPS.map((group) => (
+              <li key={group.label} className="group relative">
+                <button
+                  type="button"
+                  className="flex cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-haspopup="true"
                 >
-                  {link.label}
-                </a>
+                  {group.label}
+                  <svg className="size-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </button>
+                <div className="invisible absolute top-full left-1/2 w-56 -translate-x-1/2 pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                  <ul className="rounded-xl border border-border bg-white p-2 shadow-xl">
+                    {group.links.map((link) => (
+                      <li key={`${group.label}-${link.href}-${link.label}`}>
+                        <a href={link.href} className="block rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </li>
             ))}
           </ul>
@@ -111,15 +126,22 @@ export function Header() {
             className="overflow-hidden border-b border-border bg-white/98 shadow-lg backdrop-blur-xl lg:hidden"
           >
             <ul className="flex flex-col gap-1 px-6 py-4">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    className="block cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
-                  >
-                    {link.label}
-                  </a>
+              {NAV_GROUPS.map((group) => (
+                <li key={group.label} className="border-b border-border/70 pb-2 last:border-0">
+                  <p className="px-3 pt-2 text-[10px] font-bold tracking-[0.2em] text-primary/60 uppercase">{group.label}</p>
+                  <ul className="mt-1 grid grid-cols-2 gap-1">
+                    {group.links.map((link) => (
+                      <li key={`${group.label}-${link.href}-${link.label}`}>
+                        <a
+                          href={link.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="block cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
               <li className="mt-3 border-t border-border pt-3">

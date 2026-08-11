@@ -7,12 +7,36 @@ export const SITE = {
     "Articulamos el ecosistema de inteligencia artificial en Colombia para impulsar desarrollo, competitividad y gobernanza responsable.",
 } as const;
 
-export const NAV_LINKS = [
-  { label: "Inicio", href: "/#hero" },
-  { label: "¿Qué es ACIA?", href: "/#pilares" },
-  { label: "Afiliados", href: "/#valor" },
-  { label: "Eventos", href: "/#eventos" },
-  { label: "Gobernanza", href: "/#gobernanza" },
+export const NAV_GROUPS = [
+  {
+    label: "ACIA",
+    links: [
+      { label: "Qué somos", href: "/#pilares" },
+      { label: "Nuestra hoja de ruta", href: "/#hoja-de-ruta" },
+      { label: "Transparencia", href: "/transparencia" },
+    ],
+  },
+  {
+    label: "Comunidad",
+    links: [
+      { label: "Beneficios", href: "/#valor" },
+      { label: "Eventos", href: "/#eventos" },
+      { label: "Oportunidades", href: "/#eventos" },
+      { label: "Internacional", href: "/#internacional" },
+    ],
+  },
+  {
+    label: "Conocimiento",
+    links: [
+      { label: "Observatorio", href: "/observatorio" },
+      { label: "Papers", href: "/papers" },
+      { label: "Normatividad", href: "/normatividad" },
+    ],
+  },
+  {
+    label: "Actualidad",
+    links: [{ label: "Comunicados", href: "/comunicados" }],
+  },
 ] as const;
 
 export const HERO = {
@@ -20,9 +44,9 @@ export const HERO = {
   subtitle:
     "Articulamos el ecosistema de inteligencia artificial en Colombia para impulsar desarrollo, competitividad y gobernanza responsable.",
   cta: [
-    { label: "Afíliate a ACIA", href: "/afiliate", variant: "default" as const },
-    { label: "Conoce la nueva visión", href: "#pilares", variant: "secondary" as const },
-    { label: "Oportunidades y eventos", href: "#eventos", variant: "outline" as const },
+    { label: "Conoce ACIA", href: "#pilares", variant: "secondary" as const },
+    { label: "Afíliate", href: "/afiliate", variant: "default" as const },
+    { label: "Explora nuestro conocimiento", href: "#conocimiento", variant: "outline" as const },
   ],
   footer: "Donde la IA se convierte en desarrollo.",
 } as const;
@@ -38,6 +62,23 @@ export const NEW_STAGE = {
     "IA responsable y centrada en el ser humano",
   ],
 } as const;
+
+export const CAPABILITIES = [
+  { title: "Comunidad y articulación", description: "Conectamos actores y capacidades del ecosistema nacional." },
+  { title: "Conocimiento e investigación", description: "Promovemos evidencia y análisis para orientar decisiones." },
+  { title: "Talento y formación", description: "Impulsamos capacidades para crear y adoptar IA responsable." },
+  { title: "Innovación aplicada", description: "Acercamos la inteligencia artificial a retos productivos y sociales." },
+  { title: "Política pública y gobernanza", description: "Aportamos criterio técnico al debate y a la construcción institucional." },
+  { title: "Inclusión y sostenibilidad", description: "Trabajamos por una IA que amplíe oportunidades y genere valor duradero." },
+] as const;
+
+export const ROADMAP = [
+  { period: "2024–2027", title: "Fundación y legitimidad", description: "Consolidar bases institucionales y confianza en el ecosistema." },
+  { period: "2028–2030", title: "Escalamiento nacional", description: "Ampliar la articulación y las capacidades en Colombia." },
+  { period: "2031–2035", title: "Referencia colombiana", description: "Fortalecer el aporte técnico y científico al país." },
+  { period: "2036–2040", title: "Liderazgo regional", description: "Proyectar conocimiento y cooperación en América Latina." },
+  { period: "2041–2046", title: "Institución de legado", description: "Construir una institución sostenible para las nuevas generaciones." },
+] as const;
 
 export const PILLARS = [
   {
