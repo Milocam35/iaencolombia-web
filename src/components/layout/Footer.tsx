@@ -4,21 +4,21 @@ import { SITE } from "@/lib/constants";
 
 const navColumns = [
   {
-    title: "Explorar",
+    title: "ACIA",
     links: [
       { label: "Inicio", href: "/#hero" },
-      { label: "Nueva Etapa", href: "/#nueva-etapa" },
-      { label: "¿Qué es ACIA?", href: "/#pilares" },
-      { label: "Afiliados", href: "/#valor" },
+      { label: "Qué somos", href: "/#pilares" },
+      { label: "Hoja de ruta", href: "/#hoja-de-ruta" },
+      { label: "Transparencia", href: "/transparencia" },
     ],
   },
   {
-    title: "Comunidad",
+    title: "Conocimiento",
     links: [
-      { label: "Eventos", href: "/#eventos" },
-      { label: "Internacional", href: "/#internacional" },
-      { label: "Gobernanza", href: "/#gobernanza" },
-      { label: "Afíliate", href: "/afiliate" },
+      { label: "Observatorio", href: "/observatorio" },
+      { label: "Papers", href: "/papers" },
+      { label: "Normatividad", href: "/normatividad" },
+      { label: "Comunicados", href: "/comunicados" },
       { label: "Política de Tratamiento de Datos", href: "/politica-tratamiento-datos" },
     ],
   },

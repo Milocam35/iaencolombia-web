@@ -15,6 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://iaencolombia.org"),
   icons: {
     icon: "/logos/LOGO ACIA CIRCULAR FONDO AZUL OSCURO.png",
     apple: "/logos/LOGO ACIA CIRCULAR FONDO AZUL OSCURO.png",
@@ -53,11 +54,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Asociación Colombiana de Inteligencia Artificial",
+    alternateName: "ACIA",
+    url: "https://iaencolombia.org",
+    logo: "https://iaencolombia.org/logos/LOGO%20ACIA%20CIRCULAR%20FONDO%20AZUL%20OSCURO.png",
+    description: "Articulamos el ecosistema de inteligencia artificial en Colombia para impulsar desarrollo, competitividad y gobernanza responsable.",
+  };
+
   return (
     <html lang="es" className="scroll-smooth">
       <body
         className={`${plusJakarta.variable} ${jetbrainsMono.variable} antialiased`}
       >
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema).replace(/</g, "\\u003c") }} />
         {children}
       </body>
     </html>

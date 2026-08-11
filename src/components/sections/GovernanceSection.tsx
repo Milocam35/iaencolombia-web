@@ -4,16 +4,6 @@ import { motion } from "framer-motion";
 import { CircuitPattern } from "@/components/ui/CircuitPattern";
 import { INTERNATIONAL, GOVERNANCE } from "@/lib/constants";
 
-const allies = ["Aliado 1", "Aliado 2", "Aliado 3", "Aliado 4", "Aliado 5", "Aliado 6", "Aliado 7", "Aliado 8"];
-
-function AllyCard({ name }: { name: string }) {
-  return (
-    <div className="flex h-14 w-36 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-xs font-medium text-white/60 shadow-sm transition-colors duration-200 hover:border-accent/30 hover:text-white">
-      {name}
-    </div>
-  );
-}
-
 export function GovernanceSection() {
   return (
     <motion.section
@@ -46,24 +36,8 @@ export function GovernanceSection() {
           </p>
         </div>
 
-        {/* Marquee */}
-        <div className="relative mt-12 overflow-hidden">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-dark to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-dark to-transparent" />
-
-          <motion.div
-            className="flex gap-6"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ x: { duration: 20, repeat: Infinity, ease: "linear" } }}
-          >
-            {[...allies, ...allies].map((ally, i) => (
-              <AllyCard key={`${ally}-${i}`} name={ally} />
-            ))}
-          </motion.div>
-        </div>
-
         {/* ── Divider ── */}
-        <div className="mx-auto mt-20 flex max-w-lg items-center gap-4">
+        <div className="mx-auto mt-16 flex max-w-lg items-center gap-4">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           <span className="text-[10px] font-semibold tracking-[0.25em] text-white/25 uppercase">
             Gobernanza

@@ -7,6 +7,7 @@ import { MembershipPlansSection } from "@/components/sections/MembershipPlansSec
 import { EventsSection } from "@/components/sections/EventsSection";
 import { GovernanceSection } from "@/components/sections/GovernanceSection";
 import { CTASection } from "@/components/sections/CTASection";
+import { CapabilitiesSection, CommunicationsSection, KnowledgeSection, RoadmapSection } from "@/components/sections/InstitutionalSections";
 
 export default function Home() {
   return (
@@ -15,9 +16,13 @@ export default function Home() {
       <main>
         <HeroSection />
         <PillarsSection />
+        <CapabilitiesSection />
         <ValueSection />
         <MembershipPlansSection />
         <EventsSection />
+        <RoadmapSection />
+        <KnowledgeSection />
+        <CommunicationsSection />
         <GovernanceSection />
         <CTASection />
       </main>
