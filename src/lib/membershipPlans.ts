@@ -80,7 +80,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     id: "estudiante",
     category: "personas",
     name: "Estudiante",
-    audience: "Universitarios y recién egresados",
+    audience:
+      "Aplica exclusivamente para universitarios, estudiantes de programas técnicos o tecnológicos y recién egresados de su primera carrera. Se requiere certificado vigente de la institución educativa.",
     price: "$97.500",
     priceQualifier: "COP / año",
     discount: "50% de descuento durante el primer año",
