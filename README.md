@@ -4,7 +4,7 @@ Sitio web oficial de la **Asociación Colombiana de Inteligencia Artificial** (A
 
 ## Configuración pública
 
-- `NEXT_PUBLIC_ADMIN_PLATFORM_URL`: URL de acceso a la plataforma administrativa. Tiene como fallback el dominio oficial.
+- Accesos canónicos del encabezado: Mi ACIA (`https://mi.iaencolombia.org`) y Admin (`https://admin.iaencolombia.org`), definidos explícitamente en `src/lib/config.ts`.
 - `NEXT_PUBLIC_ACIA_API_URL`: URL base pública del backend FastAPI, sin barra final. Es necesaria para enviar el formulario de `/afiliate` y no contiene secretos.
 
 ---
@@ -183,6 +183,9 @@ npm start
 
 # Linting
 npm run lint
+
+# Verificación de la jerarquía Mi ACIA / Admin
+npm run test:member-access
 ```
 
 ---
