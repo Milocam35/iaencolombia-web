@@ -1,8 +1,6 @@
-const configuredAdminPlatformUrl =
-  process.env.NEXT_PUBLIC_ADMIN_PLATFORM_URL?.trim();
+export const ADMIN_PLATFORM_URL = "https://admin.iaencolombia.org";
 
-export const ADMIN_PLATFORM_URL =
-  configuredAdminPlatformUrl || "https://admin.iaencolombia.org/login";
+export const MEMBER_PORTAL_URL = "https://mi.iaencolombia.org";
 
 const configuredAciaApiUrl = process.env.NEXT_PUBLIC_ACIA_API_URL?.trim();
 

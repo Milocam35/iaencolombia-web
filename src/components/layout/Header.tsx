@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { NAV_GROUPS } from "@/lib/constants";
-import { ADMIN_PLATFORM_URL } from "@/lib/config";
+import { ADMIN_PLATFORM_URL, MEMBER_PORTAL_URL } from "@/lib/config";
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -16,6 +16,22 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [mobileOpen]);
 
   return (
     <header className="fixed top-0 right-0 left-0 z-50">
@@ -70,21 +86,27 @@ export function Header() {
                 </div>
               </li>
             ))}
+            <li>
+              <a
+                href={ADMIN_PLATFORM_URL}
+                className="block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Acceso administrativo
+              </a>
+            </li>
           </ul>
 
           {/* Desktop actions */}
           <div className="hidden items-center gap-2 lg:flex">
-            {ADMIN_PLATFORM_URL && (
-              <a
-                href={ADMIN_PLATFORM_URL}
-                className="cursor-pointer rounded-lg border border-primary/20 bg-white/70 px-4 py-2.5 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                Acceso administrativo
-              </a>
-            )}
+            <a
+              href={MEMBER_PORTAL_URL}
+              className="inline-flex cursor-pointer rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:bg-[#031560] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              Mi ACIA
+            </a>
             <a
               href="/afiliate"
-              className="hidden cursor-pointer rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-[#031560] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:inline-flex"
+              className="inline-flex cursor-pointer rounded-lg border border-primary/20 bg-white/70 px-4 py-2.5 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               Afíliate
             </a>
@@ -96,6 +118,7 @@ export function Header() {
             className="cursor-pointer rounded-md p-2 text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
             aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={mobileOpen}
+            aria-controls="mobile-navigation"
           >
             <svg
               className="size-5"
@@ -123,7 +146,8 @@ export function Header() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden border-b border-border bg-white/98 shadow-lg backdrop-blur-xl lg:hidden"
+            className="max-h-[calc(100vh-6.5rem)] overflow-y-auto border-b border-border bg-white/98 shadow-lg backdrop-blur-xl lg:hidden"
+            id="mobile-navigation"
           >
             <ul className="flex flex-col gap-1 px-6 py-4">
               {NAV_GROUPS.map((group) => (
@@ -144,20 +168,27 @@ export function Header() {
                   </ul>
                 </li>
               ))}
+              <li>
+                <a
+                  href={ADMIN_PLATFORM_URL}
+                  onClick={() => setMobileOpen(false)}
+                  className="block cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  Acceso administrativo
+                </a>
+              </li>
               <li className="mt-3 border-t border-border pt-3">
-                {ADMIN_PLATFORM_URL && (
-                  <a
-                    href={ADMIN_PLATFORM_URL}
-                    onClick={() => setMobileOpen(false)}
-                    className="mb-2 block cursor-pointer rounded-lg border border-primary/20 px-4 py-2.5 text-center text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-muted"
-                  >
-                    Acceso administrativo
-                  </a>
-                )}
+                <a
+                  href={MEMBER_PORTAL_URL}
+                  onClick={() => setMobileOpen(false)}
+                  className="block cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-[#031560]"
+                >
+                  Mi ACIA
+                </a>
                 <a
                   href="/afiliate"
                   onClick={() => setMobileOpen(false)}
-                  className="block cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-[#031560]"
+                  className="mt-2 block cursor-pointer rounded-lg border border-primary/20 px-4 py-2.5 text-center text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-muted"
                 >
                   Afíliate
                 </a>
