@@ -4,6 +4,25 @@ export type MembershipCategoryId =
   | "empresas"
   | "instituciones";
 
+export type ProspectType =
+  | "person"
+  | "company"
+  | "institution"
+  | "strategic_ally";
+
+export type PlanCode =
+  | "comunidad"
+  | "afiliado"
+  | "estudiante"
+  | "profesional"
+  | "micro_empresa"
+  | "pequena_empresa"
+  | "mediana_empresa"
+  | "gran_empresa"
+  | "institucion_educativa";
+
+export type PlanPaymentKind = "free" | "fixed" | "negotiated";
+
 export interface MembershipCategory {
   id: MembershipCategoryId;
   label: string;
@@ -11,8 +30,10 @@ export interface MembershipCategory {
 }
 
 export interface MembershipPlan {
-  id: string;
+  id: PlanCode;
   category: MembershipCategoryId;
+  prospectType: Exclude<ProspectType, "strategic_ally">;
+  paymentKind: PlanPaymentKind;
   name: string;
   audience: string;
   price: string;
@@ -52,6 +73,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
     id: "comunidad",
     category: "comunidad",
+    prospectType: "person",
+    paymentKind: "free",
     name: "Comunidad / Freemium",
     audience: "Cualquier persona interesada en inteligencia artificial",
     price: "$0",
@@ -65,6 +88,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
     id: "afiliado",
     category: "personas",
+    prospectType: "person",
+    paymentKind: "fixed",
     name: "Afiliado",
     audience: "Profesional independiente / estudiante",
     price: "$195.000",
@@ -79,6 +104,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
     id: "estudiante",
     category: "personas",
+    prospectType: "person",
+    paymentKind: "fixed",
     name: "Estudiante",
     audience:
       "Aplica exclusivamente para universitarios, estudiantes de programas técnicos o tecnológicos y recién egresados de su primera carrera. Se requiere certificado vigente de la institución educativa.",
@@ -96,6 +123,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
     id: "profesional",
     category: "personas",
+    prospectType: "person",
+    paymentKind: "fixed",
     name: "Profesional",
     audience: "Consultor / experto",
     price: "$790.000",
@@ -111,6 +140,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
     id: "micro_empresa",
     category: "empresas",
+    prospectType: "company",
+    paymentKind: "fixed",
     name: "Micro empresa",
     audience: "1–10 empleados",
     price: "$1.990.000",
@@ -127,6 +158,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
     id: "pequena_empresa",
     category: "empresas",
+    prospectType: "company",
+    paymentKind: "fixed",
     name: "Pequeña empresa",
     audience: "11–50 empleados",
     price: "$2.990.000",
@@ -142,6 +175,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
     id: "mediana_empresa",
     category: "empresas",
+    prospectType: "company",
+    paymentKind: "fixed",
     name: "Mediana empresa",
     audience: "51–200 empleados",
     price: "$5.990.000",
@@ -157,6 +192,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
     id: "gran_empresa",
     category: "empresas",
+    prospectType: "company",
+    paymentKind: "negotiated",
     name: "Gran empresa",
     audience: "200+ empleados",
     price: "Desde $12.000.000",
@@ -175,6 +212,8 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   {
     id: "institucion_educativa",
     category: "instituciones",
+    prospectType: "institution",
+    paymentKind: "fixed",
     name: "Institución educativa / gremio",
     audience: "Universidad, gremio o cámara de comercio",
     price: "$4.500.000",
@@ -200,3 +239,17 @@ export const STRATEGIC_ALLY = {
     "Las entidades públicas y embajadas se vinculan como aliados estratégicos. El modelo se define caso a caso.",
   cta: "Contáctanos",
 } as const;
+
+export function getMembershipPlan(planCode?: string | null) {
+  return MEMBERSHIP_PLANS.find((plan) => plan.id === planCode);
+}
+
+export function getMembershipPlanCta(
+  plan: MembershipPlan,
+  paymentsEnabled: boolean,
+) {
+  if (!paymentsEnabled) return plan.cta;
+  if (plan.paymentKind === "free") return "Afiliarme gratis";
+  if (plan.paymentKind === "negotiated") return "Solicitar afiliación";
+  return "Afiliarme y pagar";
+}

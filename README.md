@@ -7,6 +7,42 @@ Sitio web oficial de la **Asociación Colombiana de Inteligencia Artificial** (A
 - Accesos canónicos del encabezado: Mi ACIA (`https://mi.iaencolombia.org`) y Admin (`https://admin.iaencolombia.org`), definidos explícitamente en `src/lib/config.ts`.
 - `NEXT_PUBLIC_ACIA_API_URL`: URL base pública del backend FastAPI, sin barra final. Es necesaria para enviar el formulario de `/afiliate` y no contiene secretos.
 
+## Afiliación pública y Bold Checkout V1
+
+La experiencia pública mantiene un único recorrido: todos los CTA “Afíliate” llevan a `/afiliate`, las tarjetas añaden `?plan=<plan_code>` y el mismo formulario registra el prospecto antes de cualquier pago.
+
+### Feature gate
+
+- `NEXT_PUBLIC_BOLD_MEMBERSHIP_PAYMENTS_ENABLED=false`: gate frontend equivalente para Next.js a `VITE_BOLD_MEMBERSHIP_PAYMENTS_ENABLED`. Solo el valor literal `true` activa el checkout; ausente, vacío o cualquier otro valor permanece fail-closed.
+- `NEXT_PUBLIC_BOLD_MEMBERSHIP_PAYMENTS_SANDBOX_NOTICE_ENABLED=false`: muestra la indicación discreta de sandbox únicamente cuando se habilita explícitamente. Nunca se infiere el ambiente mediante la identity key.
+
+Con el gate principal desactivado, la landing conserva el copy tradicional de sus CTA, el formulario termina en el éxito existente y no carga ni abre Bold. La habilitación es una variable de build/deploy de Vercel; no contiene secretos. El gate frontend no sustituye `BOLD_PAYMENTS_ENABLED` ni `online_payment_enabled` del backend.
+
+### Contrato y rutas
+
+- `POST /public/affiliation-prospects`: conserva el payload actual, incluidos `privacy_accepted` y el honeypot `website`. Al `202`, `payment_context` permanece solo en memoria durante el flujo.
+- `POST /public/membership-payments/bold/checkout`: recibe exclusivamente `payment_context` y `plan_code`. El frontend nunca envía ni calcula el monto o la firma.
+- `/afiliate/pago/resultado`: consulta `GET /public/membership-payments/{public_token}`; no confía en parámetros de retorno de Bold.
+
+Los planes fijos muestran “Afiliarme y pagar” cuando el gate está activo; Comunidad usa “Afiliarme gratis” y los planes negociados usan “Solicitar afiliación”. Esta clasificación describe el tarifario visible, no replica `online_payment_enabled`: el backend sigue siendo la autoridad final.
+
+### Loader, resultado y almacenamiento temporal
+
+El loader añade una sola vez el script oficial `https://checkout.bold.co/library/boldPaymentButton.js`. `BoldCheckout` se construye únicamente con `apiKey`, `orderId`, `amount`, `currency`, `integritySignature`, `description`, `redirectionUrl` y el `originUrl` opcional recibidos del backend.
+
+Antes de `checkout.open()`, `publicToken` se guarda temporalmente en `sessionStorage`. La página de resultado lo consume y elimina inmediatamente, y lo conserva después solo en memoria mientras hace polling limitado (0, 1, 2, 4 y 5 segundos). El trade-off deliberado es que recargar la página después de consumir el token ya no permite recuperar la consulta; evita persistencia duradera o exposición en la URL, logs y analytics.
+
+### Sandbox y producción
+
+Para un sandbox integrado:
+
+1. desplegar el frontend con ambos flags frontend en `true`;
+2. apuntar `NEXT_PUBLIC_ACIA_API_URL` al API sandbox autorizado;
+3. configurar en el backend sandbox el redirect HTTPS exacto `/afiliate/pago/resultado`, llaves TEST y sus gates propios;
+4. usar una submission nueva para cada prueba y confirmar el estado mediante el webhook sandbox.
+
+No activar los flags frontend en producción hasta completar prueba E2E sandbox, decisión fiscal, límites operativos, monitoreo y autorización separada. Sigue abierto el P2 backend conocido: si la primera respuesta del prospecto se pierde, el retry deduplicado recibe una capability señuelo y no puede continuar al pago. No se consulta por email ni se debilita anti-enumeración; este P2 es gate pendiente para el GO final de pagos públicos.
+
 ---
 
 ## Stack Tecnológico
