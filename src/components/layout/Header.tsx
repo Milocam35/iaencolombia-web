@@ -5,7 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { NAV_GROUPS } from "@/lib/constants";
-import { ADMIN_PLATFORM_URL, MEMBER_PORTAL_URL } from "@/lib/config";
+import {
+  ADMIN_PLATFORM_URL,
+  AFFILIATION_PATH,
+  MEMBER_PORTAL_URL,
+} from "@/lib/config";
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -105,7 +109,7 @@ export function Header() {
               Mi ACIA
             </a>
             <a
-              href="/afiliate"
+              href={AFFILIATION_PATH}
               className="inline-flex cursor-pointer rounded-lg border border-primary/20 bg-white/70 px-4 py-2.5 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               Afíliate
@@ -186,7 +190,7 @@ export function Header() {
                   Mi ACIA
                 </a>
                 <a
-                  href="/afiliate"
+                  href={AFFILIATION_PATH}
                   onClick={() => setMobileOpen(false)}
                   className="mt-2 block cursor-pointer rounded-lg border border-primary/20 px-4 py-2.5 text-center text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-muted"
                 >

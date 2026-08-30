@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "node --test scripts/*.test.mjs",
+    "test:public-membership": "node --test scripts/public-membership-bold.test.mjs",
     "test:member-access": "node scripts/assert-member-access-navigation.mjs"
   },
   "dependencies": {

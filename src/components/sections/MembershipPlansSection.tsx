@@ -4,11 +4,13 @@ import { useState, type KeyboardEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { SectionWrapper } from "@/components/ui/SectionWrapper";
+import { BOLD_MEMBERSHIP_PAYMENTS_ENABLED } from "@/lib/config";
 import {
   ENTERPRISE_NOTE,
   MEMBERSHIP_CATEGORIES,
   MEMBERSHIP_PLANS,
   STRATEGIC_ALLY,
+  getMembershipPlanCta,
   type MembershipCategoryId,
   type MembershipPlan,
 } from "@/lib/membershipPlans";
@@ -107,7 +109,7 @@ function PlanCard({ plan, index }: { plan: MembershipPlan; index: number }) {
           variant={plan.featured ? "default" : "outline"}
           className="mt-7 w-full"
         >
-          {plan.cta}
+          {getMembershipPlanCta(plan, BOLD_MEMBERSHIP_PAYMENTS_ENABLED)}
         </Button>
       </div>
     </motion.article>
