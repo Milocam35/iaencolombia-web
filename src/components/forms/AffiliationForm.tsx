@@ -15,7 +15,14 @@ import {
   type AffiliationProspectPayload,
   type BoldCheckoutResponse,
 } from "@/lib/affiliationPayments";
-import { openBoldCheckout } from "@/lib/boldCheckout";
+import {
+  loadBoldCheckoutScript,
+  openBoldCheckout,
+} from "@/lib/boldCheckout";
+import {
+  attemptPreparedBoldCheckoutOpen,
+  prepareAndOpenBoldCheckout,
+} from "@/lib/boldCheckoutFlow";
 import {
   BOLD_MEMBERSHIP_PAYMENTS_ENABLED,
   BOLD_MEMBERSHIP_PAYMENTS_SANDBOX_NOTICE_ENABLED,
@@ -59,6 +66,21 @@ type Feedback = {
   message: string;
 };
 
+type PaymentState =
+  | { kind: "idle" }
+  | {
+      kind: "preparation_failed";
+      paymentContext: string;
+      planCode: PlanCode;
+    }
+  | {
+      kind: "prepared";
+      checkout: BoldCheckoutResponse;
+    };
+
+const PREPARED_CHECKOUT_MESSAGE =
+  "Tu solicitud quedó registrada. El pago ya está preparado; puedes abrir nuevamente la pasarela de Bold.";
+
 function validType(value?: string): ProspectType | null {
   return TYPE_OPTIONS.some((option) => option.value === value)
     ? (value as ProspectType)
@@ -86,12 +108,9 @@ export function AffiliationForm({
   const [planCode, setPlanCode] = useState<PlanCode | "">(preselectedPlan);
   const [phase, setPhase] = useState<FlowPhase>("idle");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [paymentRetry, setPaymentRetry] = useState<{
-    paymentContext: string;
-    planCode: PlanCode;
-  } | null>(null);
-  const [paymentReady, setPaymentReady] =
-    useState<BoldCheckoutResponse | null>(null);
+  const [paymentState, setPaymentState] = useState<PaymentState>({
+    kind: "idle",
+  });
   const submissionInFlight = useRef(false);
   const feedbackRef = useRef<HTMLDivElement>(null);
 
@@ -110,6 +129,11 @@ export function AffiliationForm({
     if (feedback) feedbackRef.current?.focus();
   }, [feedback]);
 
+  useEffect(() => {
+    if (!shouldContinueToPayment) return;
+    void loadBoldCheckoutScript().catch(() => undefined);
+  }, [shouldContinueToPayment]);
+
   const changeType = (type: ProspectType) => {
     setProspectType(type);
     setPlanCode("");
@@ -121,19 +145,39 @@ export function AffiliationForm({
     selectedPlanCode: PlanCode,
   ) => {
     setPhase("preparing_checkout");
-    const checkout = await createBoldMembershipCheckout({
-      payment_context: paymentContext,
-      plan_code: selectedPlanCode,
+    const result = await prepareAndOpenBoldCheckout({
+      paymentContext,
+      planCode: selectedPlanCode,
+      prepareCheckout: createBoldMembershipCheckout,
+      onPrepared: (checkout) => {
+        setPaymentState({ kind: "prepared", checkout });
+        setPhase("opening_checkout");
+      },
+      openCheckout: async (checkout) => {
+        storePaymentToken(checkout.publicToken);
+        await openBoldCheckout(checkout);
+      },
     });
-    storePaymentToken(checkout.publicToken);
-    try {
-      await openBoldCheckout(checkout);
-    } catch (error) {
-      clearPaymentToken();
-      throw error;
+
+    if (result.kind === "preparation_failed") {
+      setPaymentState({
+        kind: "preparation_failed",
+        paymentContext,
+        planCode: selectedPlanCode,
+      });
+      setFeedback({
+        kind: "error",
+        message: getCheckoutErrorMessage(result.error),
+      });
+      return;
     }
-    setPaymentRetry(null);
-    setPaymentReady(checkout);
+
+    if (result.kind === "opening_failed") {
+      clearPaymentToken();
+      setFeedback({ kind: "info", message: PREPARED_CHECKOUT_MESSAGE });
+      return;
+    }
+
     setFeedback({
       kind: "info",
       message:
@@ -191,12 +235,6 @@ export function AffiliationForm({
     if (paymentsEnabled && submittedPlan?.paymentKind === "fixed") {
       try {
         await prepareAndOpenPayment(paymentContext, submittedPlan.id);
-      } catch (error) {
-        setPaymentRetry({
-          paymentContext,
-          planCode: submittedPlan.id,
-        });
-        setFeedback({ kind: "error", message: getCheckoutErrorMessage(error) });
       } finally {
         setPhase("idle");
         submissionInFlight.current = false;
@@ -216,16 +254,19 @@ export function AffiliationForm({
   };
 
   const retryPreparingPayment = async () => {
-    if (!paymentRetry || submissionInFlight.current) return;
+    if (
+      paymentState.kind !== "preparation_failed" ||
+      submissionInFlight.current
+    ) {
+      return;
+    }
     submissionInFlight.current = true;
     setFeedback(null);
     try {
       await prepareAndOpenPayment(
-        paymentRetry.paymentContext,
-        paymentRetry.planCode,
+        paymentState.paymentContext,
+        paymentState.planCode,
       );
-    } catch (error) {
-      setFeedback({ kind: "error", message: getCheckoutErrorMessage(error) });
     } finally {
       setPhase("idle");
       submissionInFlight.current = false;
@@ -233,29 +274,31 @@ export function AffiliationForm({
   };
 
   const reopenPayment = async () => {
-    if (!paymentReady || submissionInFlight.current) return;
+    if (paymentState.kind !== "prepared" || submissionInFlight.current) {
+      return;
+    }
     submissionInFlight.current = true;
     setPhase("opening_checkout");
     setFeedback(null);
-    try {
-      storePaymentToken(paymentReady.publicToken);
-      await openBoldCheckout(paymentReady);
+    const result = await attemptPreparedBoldCheckoutOpen(
+      paymentState.checkout,
+      async (checkout) => {
+        storePaymentToken(checkout.publicToken);
+        await openBoldCheckout(checkout);
+      },
+    );
+    if (result.kind === "opened") {
       setFeedback({
         kind: "info",
         message:
           "La pasarela de Bold está abierta. El estado final se verificará con ACIA.",
       });
-    } catch {
+    } else {
       clearPaymentToken();
-      setFeedback({
-        kind: "error",
-        message:
-          "No pudimos abrir la pasarela. Revisa tu conexión e inténtalo nuevamente.",
-      });
-    } finally {
-      setPhase("idle");
-      submissionInFlight.current = false;
+      setFeedback({ kind: "info", message: PREPARED_CHECKOUT_MESSAGE });
     }
+    setPhase("idle");
+    submissionInFlight.current = false;
   };
 
   const submitLabel = getSubmitLabel({
@@ -453,7 +496,7 @@ export function AffiliationForm({
         {feedback && <FeedbackMessage feedback={feedback} />}
       </div>
 
-      {paymentReady ? (
+      {paymentState.kind === "prepared" ? (
         <button
           type="button"
           onClick={reopenPayment}
@@ -464,7 +507,7 @@ export function AffiliationForm({
             ? "Abriendo pago…"
             : "Abrir pago nuevamente"}
         </button>
-      ) : paymentRetry ? (
+      ) : paymentState.kind === "preparation_failed" ? (
         <button
           type="button"
           onClick={retryPreparingPayment}

@@ -32,6 +32,8 @@ El loader añade una sola vez el script oficial `https://checkout.bold.co/librar
 
 Antes de `checkout.open()`, `publicToken` se guarda temporalmente en `sessionStorage`. La página de resultado lo consume y elimina inmediatamente, y lo conserva después solo en memoria mientras hace polling limitado (0, 1, 2, 4 y 5 segundos). El trade-off deliberado es que recargar la página después de consumir el token ya no permite recuperar la consulta; evita persistencia duradera o exposición en la URL, logs y analytics.
 
+Después de crear una orden (`201`), el frontend conserva en memoria únicamente el payload seguro de checkout y lo reutiliza para volver a abrir Bold; nunca vuelve a consumir `payment_context` ni crea otra orden. Antes del `201`, un error de preparación sí conserva temporalmente la capability para permitir el retry previsto por el contrato. Un refresh pierde el payload preparado: `publicToken` solo permite consultar el estado y el contrato actual no permite reconstruir la configuración ni reabrir el checkout. Este hotfix no añade `localStorage`, búsquedas por email ni recuperación persistente.
+
 ### Sandbox y producción
 
 Para un sandbox integrado:
