@@ -6,9 +6,13 @@ import {
   getMembershipPaymentStatus,
   type MembershipPaymentStatusResponse,
 } from "@/lib/affiliationPayments";
-import { pollPaymentStatus } from "@/lib/paymentPolling";
+import { isFinalPaymentStatus, pollPaymentStatus } from "@/lib/paymentPolling";
 import { getPaymentStatusPresentation } from "@/lib/paymentResult";
-import { takePaymentToken } from "@/lib/paymentSession";
+import {
+  getPaymentToken,
+  loadPreparedCheckout,
+  reconcilePaymentSessionForStatus,
+} from "@/lib/paymentSession";
 
 type ResultState =
   | { kind: "verifying" }
@@ -27,7 +31,9 @@ export function PaymentResult() {
   useEffect(() => {
     if (paymentToken.current === undefined) {
       try {
-        paymentToken.current = takePaymentToken();
+        const preparedCheckout = loadPreparedCheckout();
+        paymentToken.current =
+          getPaymentToken() ?? preparedCheckout?.publicToken ?? null;
       } catch {
         paymentToken.current = null;
       }
@@ -54,6 +60,13 @@ export function PaymentResult() {
     })
       .then((result) => {
         if (!controller.signal.aborted && result.payment) {
+          if (isFinalPaymentStatus(result.payment.status)) {
+            try {
+              reconcilePaymentSessionForStatus(result.payment.status);
+            } catch {
+              // El resultado verificado del backend prevalece si storage no está disponible.
+            }
+          }
           setState({
             kind: "payment",
             payment: result.payment,

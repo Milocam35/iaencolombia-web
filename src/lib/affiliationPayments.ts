@@ -148,7 +148,17 @@ export async function createBoldMembershipCheckout(
     throw new PublicApiError(201, "invalid_response");
   }
 
-  return data;
+  return {
+    apiKey: data.apiKey,
+    orderId: data.orderId,
+    amount: data.amount,
+    currency: data.currency,
+    integritySignature: data.integritySignature,
+    description: data.description,
+    redirectionUrl: data.redirectionUrl,
+    ...(data.originUrl ? { originUrl: data.originUrl } : {}),
+    publicToken: data.publicToken,
+  };
 }
 
 export async function getMembershipPaymentStatus(
