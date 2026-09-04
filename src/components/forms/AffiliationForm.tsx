@@ -15,7 +15,14 @@ import {
   type AffiliationProspectPayload,
   type BoldCheckoutResponse,
 } from "@/lib/affiliationPayments";
-import { openBoldCheckout } from "@/lib/boldCheckout";
+import {
+  loadBoldCheckoutScript,
+  openBoldCheckout,
+} from "@/lib/boldCheckout";
+import {
+  attemptPreparedBoldCheckoutOpen,
+  prepareAndOpenBoldCheckout,
+} from "@/lib/boldCheckoutFlow";
 import {
   BOLD_MEMBERSHIP_PAYMENTS_ENABLED,
   BOLD_MEMBERSHIP_PAYMENTS_SANDBOX_NOTICE_ENABLED,
@@ -27,7 +34,13 @@ import {
   type PlanCode,
   type ProspectType,
 } from "@/lib/membershipPlans";
-import { clearPaymentToken, storePaymentToken } from "@/lib/paymentSession";
+import {
+  clearPaymentSession,
+  clearPaymentToken,
+  loadPreparedCheckoutForPayments,
+  storePaymentToken,
+  storePreparedCheckout,
+} from "@/lib/paymentSession";
 import { AFFILIATION_CONSENT, PRIVACY_POLICY_PATH } from "@/lib/privacyPolicy";
 
 const TYPE_OPTIONS: Array<{ value: ProspectType; label: string }> = [
@@ -59,6 +72,21 @@ type Feedback = {
   message: string;
 };
 
+type PaymentState =
+  | { kind: "idle" }
+  | {
+      kind: "preparation_failed";
+      paymentContext: string;
+      planCode: PlanCode;
+    }
+  | {
+      kind: "prepared";
+      checkout: BoldCheckoutResponse;
+    };
+
+const PREPARED_CHECKOUT_MESSAGE =
+  "Tu solicitud ya está registrada y tu pago está preparado. Puedes abrir nuevamente la pasarela de Bold.";
+
 function validType(value?: string): ProspectType | null {
   return TYPE_OPTIONS.some((option) => option.value === value)
     ? (value as ProspectType)
@@ -86,12 +114,11 @@ export function AffiliationForm({
   const [planCode, setPlanCode] = useState<PlanCode | "">(preselectedPlan);
   const [phase, setPhase] = useState<FlowPhase>("idle");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [paymentRetry, setPaymentRetry] = useState<{
-    paymentContext: string;
-    planCode: PlanCode;
-  } | null>(null);
-  const [paymentReady, setPaymentReady] =
-    useState<BoldCheckoutResponse | null>(null);
+  const [paymentState, setPaymentState] = useState<PaymentState>({
+    kind: "idle",
+  });
+  const [paymentSessionChecked, setPaymentSessionChecked] =
+    useState(!paymentsEnabled);
   const submissionInFlight = useRef(false);
   const feedbackRef = useRef<HTMLDivElement>(null);
 
@@ -110,6 +137,36 @@ export function AffiliationForm({
     if (feedback) feedbackRef.current?.focus();
   }, [feedback]);
 
+  useEffect(() => {
+    if (!paymentsEnabled) return;
+
+    let active = true;
+    let preparedCheckout: BoldCheckoutResponse | null = null;
+    try {
+      preparedCheckout = loadPreparedCheckoutForPayments(paymentsEnabled);
+    } catch {
+      preparedCheckout = null;
+    }
+
+    queueMicrotask(() => {
+      if (!active) return;
+      if (preparedCheckout) {
+        setPaymentState({ kind: "prepared", checkout: preparedCheckout });
+        setFeedback({ kind: "info", message: PREPARED_CHECKOUT_MESSAGE });
+      }
+      setPaymentSessionChecked(true);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [paymentsEnabled]);
+
+  useEffect(() => {
+    if (!shouldContinueToPayment) return;
+    void loadBoldCheckoutScript().catch(() => undefined);
+  }, [shouldContinueToPayment]);
+
   const changeType = (type: ProspectType) => {
     setProspectType(type);
     setPlanCode("");
@@ -121,19 +178,43 @@ export function AffiliationForm({
     selectedPlanCode: PlanCode,
   ) => {
     setPhase("preparing_checkout");
-    const checkout = await createBoldMembershipCheckout({
-      payment_context: paymentContext,
-      plan_code: selectedPlanCode,
+    const result = await prepareAndOpenBoldCheckout({
+      paymentContext,
+      planCode: selectedPlanCode,
+      prepareCheckout: createBoldMembershipCheckout,
+      onPrepared: (checkout) => {
+        try {
+          storePreparedCheckout(checkout);
+        } finally {
+          setPaymentState({ kind: "prepared", checkout });
+          setPhase("opening_checkout");
+        }
+      },
+      openCheckout: async (checkout) => {
+        storePaymentToken(checkout.publicToken);
+        await openBoldCheckout(checkout);
+      },
     });
-    storePaymentToken(checkout.publicToken);
-    try {
-      await openBoldCheckout(checkout);
-    } catch (error) {
-      clearPaymentToken();
-      throw error;
+
+    if (result.kind === "preparation_failed") {
+      setPaymentState({
+        kind: "preparation_failed",
+        paymentContext,
+        planCode: selectedPlanCode,
+      });
+      setFeedback({
+        kind: "error",
+        message: getCheckoutErrorMessage(result.error),
+      });
+      return;
     }
-    setPaymentRetry(null);
-    setPaymentReady(checkout);
+
+    if (result.kind === "opening_failed") {
+      clearPaymentToken();
+      setFeedback({ kind: "info", message: PREPARED_CHECKOUT_MESSAGE });
+      return;
+    }
+
     setFeedback({
       kind: "info",
       message:
@@ -191,12 +272,6 @@ export function AffiliationForm({
     if (paymentsEnabled && submittedPlan?.paymentKind === "fixed") {
       try {
         await prepareAndOpenPayment(paymentContext, submittedPlan.id);
-      } catch (error) {
-        setPaymentRetry({
-          paymentContext,
-          planCode: submittedPlan.id,
-        });
-        setFeedback({ kind: "error", message: getCheckoutErrorMessage(error) });
       } finally {
         setPhase("idle");
         submissionInFlight.current = false;
@@ -216,16 +291,19 @@ export function AffiliationForm({
   };
 
   const retryPreparingPayment = async () => {
-    if (!paymentRetry || submissionInFlight.current) return;
+    if (
+      paymentState.kind !== "preparation_failed" ||
+      submissionInFlight.current
+    ) {
+      return;
+    }
     submissionInFlight.current = true;
     setFeedback(null);
     try {
       await prepareAndOpenPayment(
-        paymentRetry.paymentContext,
-        paymentRetry.planCode,
+        paymentState.paymentContext,
+        paymentState.planCode,
       );
-    } catch (error) {
-      setFeedback({ kind: "error", message: getCheckoutErrorMessage(error) });
     } finally {
       setPhase("idle");
       submissionInFlight.current = false;
@@ -233,29 +311,51 @@ export function AffiliationForm({
   };
 
   const reopenPayment = async () => {
-    if (!paymentReady || submissionInFlight.current) return;
+    if (
+      !paymentsEnabled ||
+      paymentState.kind !== "prepared" ||
+      submissionInFlight.current
+    ) {
+      return;
+    }
     submissionInFlight.current = true;
     setPhase("opening_checkout");
     setFeedback(null);
-    try {
-      storePaymentToken(paymentReady.publicToken);
-      await openBoldCheckout(paymentReady);
+    const result = await attemptPreparedBoldCheckoutOpen(
+      paymentState.checkout,
+      async (checkout) => {
+        storePaymentToken(checkout.publicToken);
+        await openBoldCheckout(checkout);
+      },
+    );
+    if (result.kind === "opened") {
       setFeedback({
         kind: "info",
         message:
           "La pasarela de Bold está abierta. El estado final se verificará con ACIA.",
       });
-    } catch {
+    } else {
       clearPaymentToken();
-      setFeedback({
-        kind: "error",
-        message:
-          "No pudimos abrir la pasarela. Revisa tu conexión e inténtalo nuevamente.",
-      });
-    } finally {
-      setPhase("idle");
-      submissionInFlight.current = false;
+      setFeedback({ kind: "info", message: PREPARED_CHECKOUT_MESSAGE });
     }
+    setPhase("idle");
+    submissionInFlight.current = false;
+  };
+
+  const abandonPreparedPayment = () => {
+    if (paymentState.kind !== "prepared" || submissionInFlight.current) return;
+    const confirmed = window.confirm(
+      "La orden de pago actual dejará de mostrarse, pero no se eliminará del sistema. ¿Quieres iniciar una nueva solicitud?",
+    );
+    if (!confirmed) return;
+
+    try {
+      clearPaymentSession();
+    } catch {
+      // La sesión en memoria aún puede abandonarse si el navegador bloquea storage.
+    }
+    setPaymentState({ kind: "idle" });
+    setFeedback(null);
   };
 
   const submitLabel = getSubmitLabel({
@@ -264,6 +364,23 @@ export function AffiliationForm({
     selectedPlan,
     paymentsEnabled,
   });
+
+  if (!paymentSessionChecked) {
+    return <PaymentSessionLoading />;
+  }
+
+  if (paymentsEnabled && paymentState.kind === "prepared") {
+    return (
+      <PreparedCheckoutRecovery
+        busy={busy}
+        phase={phase}
+        feedback={feedback}
+        feedbackRef={feedbackRef}
+        onOpen={reopenPayment}
+        onAbandon={abandonPreparedPayment}
+      />
+    );
+  }
 
   return (
     <form
@@ -453,18 +570,7 @@ export function AffiliationForm({
         {feedback && <FeedbackMessage feedback={feedback} />}
       </div>
 
-      {paymentReady ? (
-        <button
-          type="button"
-          onClick={reopenPayment}
-          disabled={busy}
-          className={submitButtonClass}
-        >
-          {phase === "opening_checkout"
-            ? "Abriendo pago…"
-            : "Abrir pago nuevamente"}
-        </button>
-      ) : paymentRetry ? (
+      {paymentState.kind === "preparation_failed" ? (
         <button
           type="button"
           onClick={retryPreparingPayment}
@@ -495,6 +601,107 @@ export function AffiliationForm({
         Solo usaremos estos datos para atender tu interés de vinculación.
       </p>
     </form>
+  );
+}
+
+function PaymentSessionLoading() {
+  return (
+    <section
+      className="min-w-0 rounded-3xl border border-border bg-white p-7 text-center shadow-2xl shadow-primary/[0.07] sm:p-10"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <span
+        className="mx-auto block size-7 animate-spin rounded-full border-2 border-primary/20 border-t-primary"
+        aria-hidden="true"
+      />
+      <p className="mt-4 text-sm font-semibold text-primary">
+        Comprobando tu sesión de pago…
+      </p>
+    </section>
+  );
+}
+
+function PreparedCheckoutRecovery({
+  busy,
+  phase,
+  feedback,
+  feedbackRef,
+  onOpen,
+  onAbandon,
+}: {
+  busy: boolean;
+  phase: FlowPhase;
+  feedback: Feedback | null;
+  feedbackRef: React.RefObject<HTMLDivElement | null>;
+  onOpen: () => void;
+  onAbandon: () => void;
+}) {
+  return (
+    <section className="min-w-0 overflow-hidden rounded-3xl border border-primary/15 bg-white shadow-2xl shadow-primary/[0.09]">
+      <div className="h-1.5 bg-gradient-to-r from-primary via-accent to-primary" />
+      <div className="p-7 sm:p-10">
+        <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-secondary text-primary">
+          <svg
+            className="size-7"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            aria-hidden="true"
+          >
+            <path
+              d="M7 10V8a5 5 0 0 1 10 0v2M6 10h12v10H6z"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <p className="mt-6 text-center font-mono text-[10px] font-bold tracking-[0.18em] text-primary/55 uppercase">
+          Pago preparado
+        </p>
+        <h2 className="mt-2 text-center text-2xl font-extrabold tracking-tight text-primary sm:text-3xl">
+          Continúa con tu pago en Bold
+        </h2>
+        <p className="mx-auto mt-4 max-w-lg text-center text-sm leading-6 text-muted-foreground sm:text-base">
+          {PREPARED_CHECKOUT_MESSAGE}
+        </p>
+
+        <div
+          ref={feedbackRef}
+          tabIndex={-1}
+          aria-live="polite"
+          className="focus:outline-none"
+        >
+          {feedback && feedback.message !== PREPARED_CHECKOUT_MESSAGE && (
+            <FeedbackMessage feedback={feedback} />
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={onOpen}
+          disabled={busy}
+          className={submitButtonClass}
+        >
+          {phase === "opening_checkout"
+            ? "Abriendo pago…"
+            : "Abrir pago nuevamente"}
+        </button>
+        <button
+          type="button"
+          onClick={onAbandon}
+          disabled={busy}
+          className="mt-4 w-full cursor-pointer text-center text-sm font-semibold text-muted-foreground underline decoration-border underline-offset-4 transition hover:text-primary focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Cancelar este intento e iniciar una nueva solicitud
+        </button>
+        <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
+          Cerrar Bold o volver a esta página no crea otra solicitud ni otra
+          orden.
+        </p>
+      </div>
+    </section>
   );
 }
 

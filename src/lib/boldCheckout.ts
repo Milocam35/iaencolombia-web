@@ -44,18 +44,34 @@ export function loadBoldCheckoutScript(): Promise<BoldCheckoutConstructor> {
     );
     const script = existing ?? document.createElement("script");
 
-    const loaded = () => {
+    function cleanup() {
+      script.removeEventListener("load", loaded);
+      script.removeEventListener("error", failed);
+    }
+
+    function discardFailedScript() {
+      script.dataset.aciaBoldCheckoutState = "failed";
+      script.remove();
+    }
+
+    function loaded() {
+      cleanup();
       if (window.BoldCheckout) {
+        script.dataset.aciaBoldCheckoutState = "loaded";
         resolve(window.BoldCheckout);
       } else {
         boldScriptPromise = null;
+        discardFailedScript();
         reject(new Error("bold_checkout_constructor_unavailable"));
       }
-    };
-    const failed = () => {
+    }
+
+    function failed() {
+      cleanup();
       boldScriptPromise = null;
+      discardFailedScript();
       reject(new Error("bold_checkout_script_failed"));
-    };
+    }
 
     script.addEventListener("load", loaded, { once: true });
     script.addEventListener("error", failed, { once: true });
@@ -64,6 +80,7 @@ export function loadBoldCheckoutScript(): Promise<BoldCheckoutConstructor> {
       script.src = BOLD_CHECKOUT_SCRIPT_URL;
       script.async = true;
       script.dataset.aciaBoldCheckout = "true";
+      script.dataset.aciaBoldCheckoutState = "loading";
       document.head.appendChild(script);
     }
   });

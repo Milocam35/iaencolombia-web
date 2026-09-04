@@ -30,7 +30,11 @@ Los planes fijos muestran “Afiliarme y pagar” cuando el gate está activo; C
 
 El loader añade una sola vez el script oficial `https://checkout.bold.co/library/boldPaymentButton.js`. `BoldCheckout` se construye únicamente con `apiKey`, `orderId`, `amount`, `currency`, `integritySignature`, `description`, `redirectionUrl` y el `originUrl` opcional recibidos del backend.
 
-Antes de `checkout.open()`, `publicToken` se guarda temporalmente en `sessionStorage`. La página de resultado lo consume y elimina inmediatamente, y lo conserva después solo en memoria mientras hace polling limitado (0, 1, 2, 4 y 5 segundos). El trade-off deliberado es que recargar la página después de consumir el token ya no permite recuperar la consulta; evita persistencia duradera o exposición en la URL, logs y analytics.
+Después de crear una orden (`201`) y antes de `checkout.open()`, el frontend guarda en `sessionStorage` un envelope versionado con timestamp y únicamente el payload seguro de checkout: `apiKey`, `orderId`, `amount`, `currency`, `integritySignature`, `description`, `redirectionUrl`, el `originUrl` opcional y `publicToken`. El TTL es de 30 minutos. La lectura exige schema cerrado, identificadores y firma válidos, moneda COP y URLs HTTPS; cualquier valor inválido, alterado o vencido se elimina. Nunca se persisten `payment_context`, datos del formulario, PII ni secretos, y no se usa `localStorage`.
+
+El checkout preparado se rehidrata únicamente cuando el feature gate de pagos está activo. Mientras exista, `/afiliate` muestra solo la opción de reabrir Bold, sin repetir el POST del prospecto ni el POST de checkout; iniciar otra afiliación exige abandonar explícitamente la vista recuperable. Cerrar Bold no borra la sesión. La página de resultado conserva tanto el token como el checkout durante estados `created`/`pending` y elimina ambos cuando el backend informa `approved`, `rejected`, `cancelled` o `expired`.
+
+`originUrl` sigue siendo un valor HTTPS definido por el backend dentro de la configuración segura; el frontend no configura `BOLD_ORIGIN_URL` ni supone que Bold ejecutará un callback JavaScript. La persistencia temporal existe precisamente porque Bold puede navegar fuera de la página y el componente React puede montarse de nuevo tras retorno o reload.
 
 ### Sandbox y producción
 

@@ -45,6 +45,18 @@ const checkoutResponse = {
   publicToken,
 };
 
+function createSessionStorage() {
+  const values = new Map();
+  return {
+    values,
+    storage: {
+      setItem: (key, value) => values.set(key, value),
+      getItem: (key) => values.get(key) ?? null,
+      removeItem: (key) => values.delete(key),
+    },
+  };
+}
+
 test("los plan_codes coinciden con el contrato backend y el gate cambia solo el CTA", async () => {
   const plans = await import(moduleUrl("src/lib/membershipPlans.ts"));
   assert.deepEqual(
@@ -77,6 +89,7 @@ test("los plan_codes coinciden con el contrato backend y el gate cambia solo el 
     plans.getMembershipPlanCta(plans.getMembershipPlan("profesional"), false),
     "Quiero afiliarme",
   );
+  assert.equal(plans.getMembershipPlan("comunidad").paymentKind, "free");
   assert.equal(plans.getMembershipPlan("invalido"), undefined);
 });
 
@@ -167,7 +180,12 @@ test("checkout envía únicamente capability y plan_code; nunca construye amount
   let captured;
   const fetcher = async (url, init) => {
     captured = { url, init };
-    return new Response(JSON.stringify(checkoutResponse), {
+    return new Response(JSON.stringify({
+      ...checkoutResponse,
+      payment_context: paymentContext,
+      email: "ada@example.com",
+      BOLD_SECRET_KEY: "must-not-reach-state",
+    }), {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
@@ -178,6 +196,10 @@ test("checkout envía únicamente capability y plan_code; nunca construye amount
   );
 
   assert.equal(response.amount, checkoutResponse.amount);
+  assert.deepEqual(response, checkoutResponse);
+  assert.equal(Object.hasOwn(response, "payment_context"), false);
+  assert.equal(Object.hasOwn(response, "email"), false);
+  assert.equal(Object.hasOwn(response, "BOLD_SECRET_KEY"), false);
   assert.deepEqual(JSON.parse(captured.init.body), {
     payment_context: paymentContext,
     plan_code: "profesional",
@@ -275,24 +297,325 @@ test("BoldCheckout usa la respuesta backend, excluye publicToken y llama open", 
   delete globalThis.window;
 });
 
-test("publicToken vive en sessionStorage y se elimina al consumirlo", async () => {
-  const paymentSession = await import(
-    moduleUrl("src/lib/paymentSession.ts", `session-${Date.now()}`)
+test("el 201 persiste checkout antes de open y un fallo conserva estado y storage", async () => {
+  const flow = await import(
+    moduleUrl("src/lib/boldCheckoutFlow.ts", `open-failure-${Date.now()}`)
   );
-  const values = new Map();
-  globalThis.window = {
-    sessionStorage: {
-      setItem: (key, value) => values.set(key, value),
-      getItem: (key) => values.get(key) ?? null,
-      removeItem: (key) => values.delete(key),
+  const paymentSession = await import(
+    moduleUrl("src/lib/paymentSession.ts", `prepared-${Date.now()}`)
+  );
+  const { values, storage } = createSessionStorage();
+  globalThis.window = { sessionStorage: storage };
+
+  let paymentState = { kind: "idle" };
+  let checkoutPosts = 0;
+  let opens = 0;
+  const unsafeBackendResponse = {
+    ...checkoutResponse,
+    payment_context: paymentContext,
+    email: "ada@example.com",
+    BOLD_SECRET_KEY: "must-not-persist",
+  };
+
+  const result = await flow.prepareAndOpenBoldCheckout({
+    paymentContext,
+    planCode: "afiliado",
+    prepareCheckout: async (request) => {
+      checkoutPosts += 1;
+      assert.deepEqual(request, {
+        payment_context: paymentContext,
+        plan_code: "afiliado",
+      });
+      return checkoutResponse;
+    },
+    onPrepared: (checkout) => {
+      paymentSession.storePreparedCheckout(checkout, 1_000_000);
+      paymentState = { kind: "prepared", checkout };
+      assert.equal(opens, 0);
+      assert.equal(values.size, 1);
+    },
+    openCheckout: async () => {
+      opens += 1;
+      assert.equal(paymentState.kind, "prepared");
+      assert.equal(values.size, 1);
+      throw new Error("popup_blocked");
+    },
+  });
+
+  assert.equal(result.kind, "opening_failed");
+  assert.equal(paymentState.kind, "prepared");
+  assert.equal(Object.hasOwn(paymentState.checkout, "payment_context"), false);
+  assert.equal(checkoutPosts, 1);
+  assert.equal(opens, 1);
+
+  const persistedAfterFailure = [...values.values()].join("\n");
+  assert.match(persistedAfterFailure, new RegExp(checkoutResponse.orderId));
+
+  paymentSession.storePreparedCheckout(unsafeBackendResponse, 1_000_000);
+  const serialized = [...values.values()].join("\n");
+  const envelope = JSON.parse(serialized);
+  assert.equal(envelope.version, 1);
+  assert.equal(envelope.storedAt, 1_000_000);
+  assert.deepEqual(Object.keys(envelope.checkout).sort(), [
+    "amount",
+    "apiKey",
+    "currency",
+    "description",
+    "integritySignature",
+    "orderId",
+    "originUrl",
+    "publicToken",
+    "redirectionUrl",
+  ]);
+  assert.doesNotMatch(serialized, /payment_context|ada@example|must-not-persist/);
+
+  delete globalThis.window;
+});
+
+test("un error anterior al 201 sí permite reintentar la preparación", async () => {
+  const flow = await import(
+    moduleUrl("src/lib/boldCheckoutFlow.ts", `prepare-retry-${Date.now()}`)
+  );
+  let checkoutPosts = 0;
+  const prepareCheckout = async () => {
+    checkoutPosts += 1;
+    if (checkoutPosts === 1) throw new Error("network_error");
+    return checkoutResponse;
+  };
+
+  const failed = await flow.prepareAndOpenBoldCheckout({
+    paymentContext,
+    planCode: "afiliado",
+    prepareCheckout,
+    onPrepared: () => assert.fail("no debe guardar checkout sin un 201"),
+    openCheckout: () => assert.fail("no debe abrir checkout sin un 201"),
+  });
+  assert.equal(failed.kind, "preparation_failed");
+
+  let preparedCheckout = null;
+  const retried = await flow.prepareAndOpenBoldCheckout({
+    paymentContext,
+    planCode: "afiliado",
+    prepareCheckout,
+    onPrepared: (checkout) => {
+      preparedCheckout = checkout;
+    },
+    openCheckout: async () => undefined,
+  });
+
+  assert.equal(retried.kind, "opened");
+  assert.equal(preparedCheckout, checkoutResponse);
+  assert.equal(checkoutPosts, 2);
+});
+
+test("un script Bold fallido se descarta y el loader puede reintentarlo", async () => {
+  const bold = await import(
+    moduleUrl("src/lib/boldCheckout.ts", `loader-retry-${Date.now()}`)
+  );
+  let activeScript = null;
+  let appended = 0;
+  globalThis.window = {};
+  globalThis.document = {
+    querySelector: () => activeScript,
+    createElement: () => {
+      const script = new EventTarget();
+      script.dataset = {};
+      script.remove = () => {
+        if (activeScript === script) activeScript = null;
+      };
+      return script;
+    },
+    head: {
+      appendChild: (script) => {
+        appended += 1;
+        activeScript = script;
+      },
     },
   };
 
+  const first = bold.loadBoldCheckoutScript();
+  const rejected = assert.rejects(first, /bold_checkout_script_failed/);
+  activeScript.dispatchEvent(new Event("error"));
+  await rejected;
+  assert.equal(activeScript, null);
+
+  const second = bold.loadBoldCheckoutScript();
+  class Checkout {}
+  window.BoldCheckout = Checkout;
+  activeScript.dispatchEvent(new Event("load"));
+  assert.equal(await second, Checkout);
+  assert.equal(appended, 2);
+
+  delete globalThis.document;
+  delete globalThis.window;
+});
+
+test("remount rehidrata prepared y tres reaperturas no repiten ningún POST", async () => {
+  const paymentSession = await import(
+    moduleUrl("src/lib/paymentSession.ts", `remount-${Date.now()}`)
+  );
+  const flow = await import(
+    moduleUrl("src/lib/boldCheckoutFlow.ts", `remount-flow-${Date.now()}`)
+  );
+  const { values, storage } = createSessionStorage();
+  globalThis.window = { sessionStorage: storage };
+
+  paymentSession.storePreparedCheckout(checkoutResponse, 2_000_000);
+  let paymentState = { kind: "idle" };
+
+  const rehydrated = paymentSession.loadPreparedCheckoutForPayments(
+    true,
+    2_001_000,
+  );
+  if (rehydrated) paymentState = { kind: "prepared", checkout: rehydrated };
+
+  const prospectPosts = 0;
+  const checkoutPosts = 0;
+  let opens = 0;
+  for (let retry = 0; retry < 3; retry += 1) {
+    const retryResult = await flow.attemptPreparedBoldCheckoutOpen(
+      paymentState.checkout,
+      async () => {
+        opens += 1;
+      },
+    );
+    assert.equal(retryResult.kind, "opened");
+  }
+
+  assert.equal(paymentState.kind, "prepared");
+  assert.equal(paymentState.checkout.orderId, checkoutResponse.orderId);
+  assert.equal(prospectPosts, 0);
+  assert.equal(checkoutPosts, 0);
+  assert.equal(opens, 3);
+  assert.equal(values.size, 1);
+
+  delete globalThis.window;
+});
+
+test("checkout expirado se elimina junto con el token público", async () => {
+  const paymentSession = await import(
+    moduleUrl("src/lib/paymentSession.ts", `expired-${Date.now()}`)
+  );
+  const { values, storage } = createSessionStorage();
+  globalThis.window = { sessionStorage: storage };
+
+  const storedAt = 3_000_000;
+  paymentSession.storePreparedCheckout(checkoutResponse, storedAt);
+  paymentSession.storePaymentToken(publicToken);
+  assert.equal(values.size, 2);
+  assert.equal(
+    paymentSession.loadPreparedCheckout(
+      storedAt + paymentSession.PREPARED_CHECKOUT_TTL_MS,
+    ),
+    null,
+  );
+  assert.equal(values.size, 0);
+
+  delete globalThis.window;
+});
+
+test("payload preparado alterado o inválido se elimina inmediatamente", async () => {
+  const paymentSession = await import(
+    moduleUrl("src/lib/paymentSession.ts", `tampered-${Date.now()}`)
+  );
+  const { values, storage } = createSessionStorage();
+  globalThis.window = { sessionStorage: storage };
+  const now = 4_000_000;
+  const mutations = [
+    (envelope) => { envelope.checkout.orderId = "orden inválida"; },
+    (envelope) => { envelope.checkout.amount = 0; },
+    (envelope) => { envelope.checkout.currency = "USD"; },
+    (envelope) => { envelope.checkout.integritySignature = "altered"; },
+    (envelope) => { envelope.checkout.publicToken = "short"; },
+    (envelope) => { envelope.checkout.redirectionUrl = "http://example.com"; },
+    (envelope) => { envelope.checkout.originUrl = "javascript:alert(1)"; },
+    (envelope) => { envelope.checkout.email = "ada@example.com"; },
+  ];
+
+  for (const mutate of mutations) {
+    values.clear();
+    paymentSession.storePreparedCheckout(checkoutResponse, now);
+    paymentSession.storePaymentToken(publicToken);
+    const preparedEntry = [...values.entries()].find(([, value]) =>
+      value.startsWith('{"version":1'),
+    );
+    assert.ok(preparedEntry);
+    const [key, serialized] = preparedEntry;
+    const envelope = JSON.parse(serialized);
+    mutate(envelope);
+    values.set(key, JSON.stringify(envelope));
+
+    assert.equal(paymentSession.loadPreparedCheckout(now + 1), null);
+    assert.equal(values.size, 0);
+  }
+
+  delete globalThis.window;
+});
+
+test("approved y demás estados terminales limpian; pending conserva la reapertura", async () => {
+  const paymentSession = await import(
+    moduleUrl("src/lib/paymentSession.ts", `terminal-${Date.now()}`)
+  );
+  const { values, storage } = createSessionStorage();
+  globalThis.window = { sessionStorage: storage };
+
+  for (const status of ["approved", "rejected", "cancelled", "expired"]) {
+    paymentSession.storePreparedCheckout(checkoutResponse, 5_000_000);
+    paymentSession.storePaymentToken(publicToken);
+    assert.equal(
+      paymentSession.reconcilePaymentSessionForStatus("created"),
+      false,
+    );
+    assert.equal(
+      paymentSession.reconcilePaymentSessionForStatus("pending"),
+      false,
+    );
+    assert.equal(values.size, 2);
+    assert.equal(paymentSession.reconcilePaymentSessionForStatus(status), true);
+    assert.equal(values.size, 0);
+  }
+
+  delete globalThis.window;
+});
+
+test("feature flag false no lee checkout ni habilita apertura Bold", async () => {
+  const paymentSession = await import(
+    moduleUrl("src/lib/paymentSession.ts", `gate-off-${Date.now()}`)
+  );
+  let storageReads = 0;
+  let opens = 0;
+  globalThis.window = {
+    sessionStorage: {
+      setItem: () => undefined,
+      getItem: () => {
+        storageReads += 1;
+        return null;
+      },
+      removeItem: () => undefined,
+    },
+  };
+
+  const rehydrated = paymentSession.loadPreparedCheckoutForPayments(false);
+  if (rehydrated) opens += 1;
+  assert.equal(rehydrated, null);
+  assert.equal(storageReads, 0);
+  assert.equal(opens, 0);
+
+  delete globalThis.window;
+});
+
+test("publicToken permanece disponible para reload hasta limpieza terminal", async () => {
+  const paymentSession = await import(
+    moduleUrl("src/lib/paymentSession.ts", `token-${Date.now()}`)
+  );
+  const { values, storage } = createSessionStorage();
+  globalThis.window = { sessionStorage: storage };
+
   paymentSession.storePaymentToken(publicToken);
   assert.equal(values.size, 1);
-  assert.equal(paymentSession.takePaymentToken(), publicToken);
-  assert.equal(values.size, 0);
-  assert.equal(paymentSession.takePaymentToken(), null);
+  assert.equal(paymentSession.getPaymentToken(), publicToken);
+  assert.equal(paymentSession.getPaymentToken(), publicToken);
+  assert.equal(values.size, 1);
 
   delete globalThis.window;
 });
@@ -380,6 +703,7 @@ test("guardas de privacidad, honeypot y doble submit permanecen en el formulario
     source("src/lib/boldCheckout.ts"),
     source("src/lib/paymentSession.ts"),
     source("src/components/payments/PaymentResult.tsx"),
+    source("src/lib/boldCheckoutFlow.ts"),
   ]);
   const form = files[0];
   assert.match(form, /name="privacy_accepted"/);
@@ -387,9 +711,27 @@ test("guardas de privacidad, honeypot y doble submit permanecen en el formulario
   assert.match(form, /submissionInFlight\.current/);
   assert.match(form, /if \(submissionInFlight\.current\) return/);
   assert.match(form, /aria-live="polite"/);
+  assert.match(form, /kind: "prepared"/);
+  assert.match(form, /loadPreparedCheckoutForPayments\(paymentsEnabled\)/);
+  assert.match(form, /storePreparedCheckout\(checkout\)/);
+  assert.match(form, /Abrir pago nuevamente/);
+  assert.match(form, /Cancelar este intento e iniciar una nueva solicitud/);
+  assert.match(form, /Intentar preparar el pago nuevamente/);
+  assert.match(
+    form,
+    /Tu solicitud ya está registrada y tu pago está preparado\. Puedes abrir nuevamente la pasarela de Bold\./,
+  );
+  assert.doesNotMatch(form, /pago (fue|ha sido) (rechazado|no fue aprobado)/i);
+  assert.match(form, /if \(!shouldContinueToPayment\) return/);
+
+  const resultPage = files[4];
+  assert.match(resultPage, /reconcilePaymentSessionForStatus/);
+  assert.doesNotMatch(resultPage, /takePaymentToken/);
 
   const securitySurface = files.join("\n");
   assert.doesNotMatch(securitySurface, /console\.(log|info|debug|warn)/);
   assert.doesNotMatch(securitySurface, /localStorage/);
   assert.doesNotMatch(securitySurface, /bold-tx-status|bold-order-id/);
+  assert.doesNotMatch(securitySurface, /BOLD_SECRET_KEY/);
+  assert.doesNotMatch(securitySurface, /analytics/i);
 });
