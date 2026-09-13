@@ -114,6 +114,70 @@ test("el feature gate es fail-closed y solo acepta true explícito", async () =>
   }
 });
 
+test("un plan vacío, desconocido o de otro tipo no permite enviar solicitudes", async () => {
+  const { getMembershipSubmissionAction } = await import(
+    moduleUrl("src/lib/membershipPlans.ts"),
+  );
+  for (const paymentsEnabled of [true, false]) {
+    for (const prospectType of ["person", "company", "institution"]) {
+      for (const planCode of ["", "no_estoy_seguro", "invalido"]) {
+        assert.equal(
+          getMembershipSubmissionAction(prospectType, planCode, paymentsEnabled),
+          "select_plan",
+        );
+      }
+    }
+    for (const [prospectType, planCode] of [
+      ["person", "micro_empresa"],
+      ["company", "comunidad"],
+      ["institution", "gran_empresa"],
+    ]) {
+      assert.equal(
+        getMembershipSubmissionAction(prospectType, planCode, paymentsEnabled),
+        "select_plan",
+      );
+    }
+  }
+});
+
+test("solo Comunidad/Freemium y Gran empresa terminan en una solicitud sin pago", async () => {
+  const { MEMBERSHIP_PLANS, getMembershipSubmissionAction } = await import(
+    moduleUrl("src/lib/membershipPlans.ts"),
+  );
+  for (const paymentsEnabled of [true, false]) {
+    const requestPlans = MEMBERSHIP_PLANS.filter(
+      (plan) => getMembershipSubmissionAction(
+        plan.prospectType,
+        plan.id,
+        paymentsEnabled,
+      ) === "request",
+    );
+    assert.deepEqual(requestPlans.map((plan) => plan.id), ["comunidad", "gran_empresa"]);
+    assert.equal(
+      getMembershipSubmissionAction("strategic_ally", "", paymentsEnabled),
+      "contact",
+    );
+  }
+});
+
+test("los siete planes de pago requieren checkout y nunca se degradan a solicitud", async () => {
+  const { getMembershipSubmissionAction } = await import(
+    moduleUrl("src/lib/membershipPlans.ts"),
+  );
+  for (const [prospectType, planCode] of [
+    ["person", "afiliado"],
+    ["person", "estudiante"],
+    ["person", "profesional"],
+    ["company", "micro_empresa"],
+    ["company", "pequena_empresa"],
+    ["company", "mediana_empresa"],
+    ["institution", "institucion_educativa"],
+  ]) {
+    assert.equal(getMembershipSubmissionAction(prospectType, planCode, true), "payment");
+    assert.equal(getMembershipSubmissionAction(prospectType, planCode, false), "payment_unavailable");
+  }
+});
+
 test("el 202 captura payment_context y conserva el payload existente", async () => {
   const api = await importAffiliationPayments();
   let captured;
@@ -211,7 +275,8 @@ test("los errores de checkout tienen mensajes seguros y accionables", async () =
   const api = await importAffiliationPayments();
   for (const status of [404, 409, 422, 429, 503]) {
     const message = api.getCheckoutErrorMessage(new api.PublicApiError(status));
-    assert.match(message, /solicitud quedó registrada/i);
+    assert.match(message, /datos quedaron registrados/i);
+    assert.doesNotMatch(message, /solicitud|nuestro equipo continuará/i);
     assert.doesNotMatch(message, /trace|payment_context|publicToken/i);
   }
 });
@@ -715,11 +780,11 @@ test("guardas de privacidad, honeypot y doble submit permanecen en el formulario
   assert.match(form, /loadPreparedCheckoutForPayments\(paymentsEnabled\)/);
   assert.match(form, /storePreparedCheckout\(checkout\)/);
   assert.match(form, /Abrir pago nuevamente/);
-  assert.match(form, /Cancelar este intento e iniciar una nueva solicitud/);
+  assert.match(form, /Elegir otro plan/);
   assert.match(form, /Intentar preparar el pago nuevamente/);
   assert.match(
     form,
-    /Tu solicitud ya está registrada y tu pago está preparado\. Puedes abrir nuevamente la pasarela de Bold\./,
+    /Tus datos están registrados y tu pago está listo\. Continúa en la pasarela segura de Bold para completar el pago\./,
   );
   assert.doesNotMatch(form, /pago (fue|ha sido) (rechazado|no fue aprobado)/i);
   assert.match(form, /if \(!shouldContinueToPayment\) return/);

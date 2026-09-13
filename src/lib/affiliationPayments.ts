@@ -197,18 +197,18 @@ export function getCheckoutErrorMessage(error: unknown) {
   const status = error instanceof PublicApiError ? error.status : null;
 
   if (status === 404) {
-    return "Tu solicitud quedó registrada, pero no fue posible autorizar este pago. Escríbenos a info@iaencolombia.org para continuar.";
+    return "Tus datos quedaron registrados, pero no fue posible preparar el pago. Escríbenos a info@iaencolombia.org para continuar.";
   }
   if (status === 409) {
-    return "Tu solicitud quedó registrada. Este plan no se procesa mediante pago en línea; nuestro equipo continuará el proceso contigo.";
+    return "Tus datos quedaron registrados, pero este plan no está disponible para pago en línea. Escríbenos a info@iaencolombia.org para resolverlo.";
   }
   if (status === 422) {
-    return "Tu solicitud quedó registrada, pero el plan no está habilitado para pago en línea en este momento.";
+    return "Tus datos quedaron registrados, pero el plan no está habilitado para pago en línea en este momento. Inténtalo más tarde.";
   }
   if (status === 429) {
-    return "Tu solicitud quedó registrada. Alcanzaste el límite temporal de intentos de pago; espera unos minutos antes de consultar nuevamente.";
+    return "Tus datos quedaron registrados. Alcanzaste el límite temporal de intentos de pago; espera unos minutos antes de reintentar el pago.";
   }
-  return "Tu solicitud quedó registrada, pero no pudimos preparar el pago. Inténtalo nuevamente o escríbenos a info@iaencolombia.org.";
+  return "Tus datos quedaron registrados, pero no pudimos preparar el pago. Inténtalo nuevamente o escríbenos a info@iaencolombia.org.";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
