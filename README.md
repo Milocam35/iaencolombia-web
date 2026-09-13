@@ -11,12 +11,16 @@ Sitio web oficial de la **Asociación Colombiana de Inteligencia Artificial** (A
 
 La experiencia pública mantiene un único recorrido: todos los CTA “Afíliate” llevan a `/afiliate`, las tarjetas añaden `?plan=<plan_code>` y el mismo formulario registra el prospecto antes de cualquier pago.
 
+El plan empieza sin seleccionar, incluso al llegar desde una tarjeta; el parámetro `plan` orienta el tipo de vinculación. Es obligatorio elegir un plan del tipo seleccionado. Cambiar el tipo reinicia el plan, conserva los datos de contacto entre personas, empresas e instituciones y muestra un aviso visual. El mensaje es opcional.
+
+Con pagos habilitados, los siete planes de tarifa fija continúan directamente a Bold. Solo Comunidad / Freemium y Gran empresa terminan en una solicitud sin checkout. Las entidades públicas y embajadas tienen contacto directo por correo para gestionar su alianza estratégica.
+
 ### Feature gate
 
 - `NEXT_PUBLIC_BOLD_MEMBERSHIP_PAYMENTS_ENABLED=false`: gate frontend equivalente para Next.js a `VITE_BOLD_MEMBERSHIP_PAYMENTS_ENABLED`. Solo el valor literal `true` activa el checkout; ausente, vacío o cualquier otro valor permanece fail-closed.
 - `NEXT_PUBLIC_BOLD_MEMBERSHIP_PAYMENTS_SANDBOX_NOTICE_ENABLED=false`: muestra la indicación discreta de sandbox únicamente cuando se habilita explícitamente. Nunca se infiere el ambiente mediante la identity key.
 
-Con el gate principal desactivado, la landing conserva el copy tradicional de sus CTA, el formulario termina en el éxito existente y no carga ni abre Bold. La habilitación es una variable de build/deploy de Vercel; no contiene secretos. El gate frontend no sustituye `BOLD_PAYMENTS_ENABLED` ni `online_payment_enabled` del backend.
+Con el gate principal desactivado, la landing conserva el copy tradicional de sus CTA y no se carga ni abre Bold. Los planes de tarifa fija muestran que el pago no está disponible y bloquean el envío antes de registrar un prospecto; no se convierten en solicitudes sin pago. Comunidad / Freemium y Gran empresa conservan su solicitud. La habilitación es una variable de build/deploy de Vercel; no contiene secretos. El gate frontend no sustituye `BOLD_PAYMENTS_ENABLED` ni `online_payment_enabled` del backend.
 
 ### Contrato y rutas
 

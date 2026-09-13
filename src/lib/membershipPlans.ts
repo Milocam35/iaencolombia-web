@@ -244,6 +244,21 @@ export function getMembershipPlan(planCode?: string | null) {
   return MEMBERSHIP_PLANS.find((plan) => plan.id === planCode);
 }
 
+export function getMembershipSubmissionAction(
+  prospectType: ProspectType,
+  planCode: string,
+  paymentsEnabled: boolean,
+) {
+  if (prospectType === "strategic_ally") return "contact";
+
+  const plan = getMembershipPlan(planCode);
+  if (!plan || plan.prospectType !== prospectType) return "select_plan";
+  if (plan.paymentKind === "free" || plan.paymentKind === "negotiated") {
+    return "request";
+  }
+  return paymentsEnabled ? "payment" : "payment_unavailable";
+}
+
 export function getMembershipPlanCta(
   plan: MembershipPlan,
   paymentsEnabled: boolean,
