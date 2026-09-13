@@ -884,6 +884,12 @@ function PlanSummary({
             : plan.paymentKind === "negotiated"
               ? "Envía tu solicitud y nuestro equipo te contactará para coordinar la afiliación y el pago de este plan a medida."
               : PAYMENT_UNAVAILABLE_MESSAGE}
+        {plan.paymentKind === "free" && (
+          <span className="mt-2 block font-semibold">
+            Este plan no incluye acceso a la plataforma Mi ACIA ni a sus
+            funcionalidades.
+          </span>
+        )}
       </p>
     </section>
   );
