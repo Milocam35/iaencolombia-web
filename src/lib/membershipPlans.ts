@@ -80,8 +80,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
     price: "$0",
     label: "Gratuito",
     benefits: [
-      "Newsletter ACIA Weekly",
-      "Vista parcial del directorio de afiliados",
+      "Comunicaciones y newsletters con suscripción voluntaria",
     ],
     cta: "Quiero afiliarme",
   },
