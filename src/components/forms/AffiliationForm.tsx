@@ -1,5 +1,7 @@
 "use client";
 
+import { COMMUNITY_CONSENT, COMMUNITY_CONSENT_VERSION, communityRegistrationMessage } from '@/lib/community';
+
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import {
@@ -291,6 +293,7 @@ export function AffiliationForm({
       city: nullable("city"),
       message: nullable("message"),
       privacy_accepted: form.get("privacy_accepted") === "on",
+      ...(submittedPlan.id === 'comunidad' ? { communications_consent: form.get('communications_consent') === 'on', communications_consent_version: COMMUNITY_CONSENT_VERSION } : {}),
       website: nullable("website"),
     };
 
@@ -326,7 +329,7 @@ export function AffiliationForm({
     setFeedback({
       kind: "success",
       message:
-        "Hemos recibido tu interés en vincularte a ACIA. Te contactaremos al correo registrado para continuar el proceso.",
+        submittedPlan.id === 'comunidad' ? communityRegistrationMessage(Boolean(payload.communications_consent)) : "Hemos recibido tu interés en vincularte a ACIA. Te contactaremos al correo registrado para continuar el proceso.",
     });
     formElement.reset();
     setPlanCode("");
@@ -599,12 +602,12 @@ export function AffiliationForm({
                   name="email"
                   type="email"
                   required
-                  maxLength={320}
+                  maxLength={planCode === 'comunidad' ? 254 : 320}
                   autoComplete="email"
                   className={inputClass}
                 />
               </Field>
-              <Field
+              {planCode !== 'comunidad' && <><Field
                 label="Teléfono / WhatsApp"
                 hint="Opcional, pero recomendado"
               >
@@ -623,7 +626,7 @@ export function AffiliationForm({
                   autoComplete="address-level2"
                   className={inputClass}
                 />
-              </Field>
+              </Field></>}
               {showOrganization && (
                 <>
                   <Field label="Organización" required>
@@ -647,7 +650,7 @@ export function AffiliationForm({
               )}
             </div>
 
-            <Field label="Mensaje" hint="opcional" className="mt-5">
+            {planCode !== 'comunidad' && <Field label="Mensaje" hint="opcional" className="mt-5">
               <textarea
                 name="message"
                 maxLength={2000}
@@ -655,7 +658,7 @@ export function AffiliationForm({
                 className={inputClass}
                 placeholder="Cuéntanos brevemente qué esperas encontrar en ACIA."
               />
-            </Field>
+            </Field>}
 
             <div
               className="absolute -left-[10000px] top-auto size-px overflow-hidden"
@@ -690,6 +693,7 @@ export function AffiliationForm({
                 {AFFILIATION_CONSENT.suffix} <Required />
               </span>
             </label>
+            {planCode === 'comunidad' && <div className="mt-4 border-t border-border pt-4"><label className="flex cursor-pointer items-start gap-3 rounded-xl bg-surface p-4 text-sm leading-6 text-muted-foreground"><input name="communications_consent" type="checkbox" className="mt-1 size-4 shrink-0 accent-primary" /><span>{COMMUNITY_CONSENT}</span></label><p className="mt-3 text-sm text-muted-foreground">Es opcional. Puedes registrarte sin suscribirte. <Link href="/comunidad/preferencias" className="font-semibold text-primary underline">Gestionar mi suscripción o darme de baja</Link></p></div>}
           </fieldset>
 
           <div

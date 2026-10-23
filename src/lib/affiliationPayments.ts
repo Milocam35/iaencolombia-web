@@ -12,6 +12,8 @@ export interface AffiliationProspectPayload {
   city: string | null;
   message: string | null;
   privacy_accepted: boolean;
+  communications_consent?: boolean;
+  communications_consent_version?: string;
   website: string | null;
 }
 
