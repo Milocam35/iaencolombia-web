@@ -1,3 +1,4 @@
+import { NewslettersSection } from '@/components/sections/NewslettersSection';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/sections/HeroSection";
@@ -23,6 +24,7 @@ export default function Home() {
         <RoadmapSection />
         <KnowledgeSection />
         <CommunicationsSection />
+        <NewslettersSection />
         <GovernanceSection />
         <CTASection />
       </main>
