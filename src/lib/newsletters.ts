@@ -2,6 +2,7 @@ import { cache } from 'react';
 import { ACIA_API_URL } from './config';
 
 export interface PublicNewsletter {
+  edition_number?: number | null; editorial_theme?: string | null;
   id: string; slug: string; revision_id: string; version: number; title: string;
   summary: string; published_at: string; first_published_at: string; url: string;
   content_markdown: string;
