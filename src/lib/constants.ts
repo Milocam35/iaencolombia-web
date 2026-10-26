@@ -35,7 +35,7 @@ export const NAV_GROUPS = [
   },
   {
     label: "Actualidad",
-    links: [{ label: "Comunicados", href: "/comunicados" }],
+    links: [{ label: "Comunicados", href: "/comunicados" }, { label: "Newsletters", href: "/newsletters" }],
   },
 ] as const;
 
