@@ -21,5 +21,5 @@ test('public edition exposes its revision for readiness and has canonical metada
 test('homepage reads backend editions rather than a new hardcoded editorial source',()=>{
   assert.match(source('src/app/page.tsx'),/<NewslettersSection/);
   assert.match(source('src/components/sections/NewslettersSection.tsx'),/listNewsletters\(3\)/);
-  assert.match(source('src/lib/constants.ts'),/label: "Newsletters", href: "\/newsletters"/);
+  assert.match(source('src/lib/constants.ts'),/label: "ACIA al día", href: "\/newsletters"/);
 });

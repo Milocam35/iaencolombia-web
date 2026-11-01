@@ -11,5 +11,5 @@ export default async function NewslettersPage({ searchParams }: { searchParams: 
   const query = await searchParams;
   const page = /^\d{1,4}$/.test(query.page ?? '') ? Math.max(1, Math.min(1000, Number(query.page))) : 1;
   const items = await listNewsletters(12, (page - 1) * 12).catch(() => null);
-  return <><Header/><main className="pt-24"><NewsletterListing items={items} page={page}/></main><Footer/></>;
+  return <><Header/><main id="contenido" tabIndex={-1} className="pt-24"><NewsletterListing items={items} page={page}/></main><Footer/></>;
 }

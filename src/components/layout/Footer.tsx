@@ -1,105 +1,61 @@
 import Image from "next/image";
 import Link from "next/link";
-import { SITE } from "@/lib/constants";
-
-const navColumns = [
-  {
-    title: "ACIA",
-    links: [
-      { label: "Inicio", href: "/#hero" },
-      { label: "Qué somos", href: "/#pilares" },
-      { label: "Hoja de ruta", href: "/#hoja-de-ruta" },
-      { label: "Transparencia", href: "/transparencia" },
-    ],
-  },
-  {
-    title: "Conocimiento",
-    links: [
-      { label: "Observatorio", href: "/observatorio" },
-      { label: "Papers", href: "/papers" },
-      { label: "Normatividad", href: "/normatividad" },
-      { label: "Comunicados", href: "/comunicados" },
-      { label: "Política de Tratamiento de Datos", href: "/politica-tratamiento-datos" },
-    ],
-  },
-];
-
+import { SITE, NAV_GROUPS } from "@/lib/constants";
+import { ADMIN_PLATFORM_URL, MEMBER_PORTAL_URL } from "@/lib/config";
+import { PUBLIC_CONTACT } from "@/data/publicExperience";
 export function Footer() {
   return (
-    <footer className="bg-dark">
-      {/* Top accent line */}
-      <div className="h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
-
-      <div className="mx-auto max-w-screen-xl px-6 pt-16 pb-10">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
-          {/* Brand column */}
-          <div className="lg:col-span-4">
-            <Link href="/" className="inline-block">
+    <footer className="site-footer">
+      <div className="site-container">
+        <div className="footer-top">
+          <div>
+            <Link href="/">
               <Image
                 src="/logos/LOGO ACIA TRANSPARENTE PARA FONDO AZUL OSCURO.png"
                 alt="ACIA"
-                width={70}
-                height={70}
-                className="transition-opacity duration-200 hover:opacity-80"
+                width={180}
+                height={80}
+                className="footer-logo"
               />
             </Link>
-            <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/50">
-              {SITE.description}
-            </p>
-            <p className="mt-4 text-xs font-medium italic text-accent/60">
-              {SITE.tagline}
-            </p>
+            <p>{SITE.name}</p>
+            <span>Donde la IA se convierte en desarrollo.</span>
           </div>
-
-          {/* Navigation columns */}
-          {navColumns.map((col) => (
-            <div key={col.title} className="lg:col-span-2">
-              <p className="text-[10px] font-bold tracking-[0.25em] text-white/30 uppercase">
-                {col.title}
-              </p>
-              <ul className="mt-5 space-y-3">
-                {col.links.map((link) => (
+          <div className="footer-contact">
+            <span>Conversemos</span>
+            <a href={`mailto:${PUBLIC_CONTACT}`}>
+              {PUBLIC_CONTACT} <span aria-hidden="true">↗</span>
+            </a>
+            <p>Bogotá, Colombia</p>
+          </div>
+        </div>
+        <nav
+          className="footer-navigation"
+          aria-label="Enlaces del pie de página"
+        >
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label}>
+              <h2>{group.label}</h2>
+              <ul>
+                {group.links.map((link) => (
                   <li key={link.href}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-white/60 transition-colors duration-200 hover:text-accent"
-                    >
-                      {link.label}
-                    </a>
+                    <a href={link.href}>{link.label}</a>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
-
-          {/* Contact column */}
-          <div className="lg:col-span-4">
-            <p className="text-[10px] font-bold tracking-[0.25em] text-white/30 uppercase">
-              Contacto
-            </p>
-            <div className="mt-5 space-y-3">
-              <a
-                href={`mailto:info@${SITE.domain}`}
-                className="block text-sm text-white/60 transition-colors duration-200 hover:text-accent"
-              >
-                info@{SITE.domain}
-              </a>
-              <p className="text-sm text-white/40">
-                Bogotá, Colombia
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="mt-14 border-t border-white/[0.06] pt-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-xs text-white/30">
-              &copy; {new Date().getFullYear()} {SITE.name}
-            </p>
-            <p className="text-xs text-white/20">
-              Todos los derechos reservados
-            </p>
+        </nav>
+        <div className="footer-bottom">
+          <p>
+            © {new Date().getFullYear()} ACIA. Todos los derechos reservados.
+          </p>
+          <div>
+            <a href="/politica-tratamiento-datos">
+              Política de tratamiento de datos
+            </a>
+            <a href={MEMBER_PORTAL_URL}>Mi ACIA</a>
+            <a href={ADMIN_PLATFORM_URL}>Acceso administrativo</a>
           </div>
         </div>
       </div>

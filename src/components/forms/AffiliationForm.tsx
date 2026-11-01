@@ -309,7 +309,7 @@ export function AffiliationForm({
       setFeedback({
         kind: "error",
         message:
-          "No pudimos registrar tus datos. Revisa la información e inténtalo nuevamente. Si el problema continúa, escríbenos a info@iaencolombia.org.",
+          "No pudimos registrar tus datos. Revisa la información e inténtalo nuevamente. Si el problema continúa, escríbenos a contacto@iaencolombia.org.",
       });
       setPhase("idle");
       submissionInFlight.current = false;
@@ -534,11 +534,11 @@ export function AffiliationForm({
             colaboración. Nuestro equipo te orientará sobre los siguientes
             pasos.
           </p>
-          <a href="mailto:info@iaencolombia.org" className={submitButtonClass}>
+          <a href="mailto:contacto@iaencolombia.org" className={submitButtonClass}>
             Contactar a ACIA
           </a>
           <p className="mt-3 break-all text-center text-sm text-muted-foreground">
-            info@iaencolombia.org
+            contacto@iaencolombia.org
           </p>
         </div>
       ) : (

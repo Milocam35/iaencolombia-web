@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local-only review evidence and browser tooling
+/.local-review/
+
+/review-acia-opcion3/

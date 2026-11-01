@@ -32,7 +32,7 @@ export default async function AffiliationPage({
   return (
     <>
       <Header />
-      <main className="relative min-h-screen overflow-hidden bg-surface pt-28 pb-20">
+      <main id="contenido" tabIndex={-1} className="relative min-h-screen overflow-hidden bg-surface pt-28 pb-20">
         <div className="pointer-events-none absolute inset-0 gradient-mesh" />
         <div className="pointer-events-none absolute top-24 -right-36 size-96 rounded-full bg-accent/10 blur-3xl" />
         <div className="relative mx-auto grid w-full max-w-screen-xl grid-cols-[minmax(0,1fr)] gap-10 px-6 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] lg:items-start lg:gap-16">

@@ -8,35 +8,12 @@ export const SITE = {
 } as const;
 
 export const NAV_GROUPS = [
-  {
-    label: "ACIA",
-    links: [
-      { label: "Qué somos", href: "/#pilares" },
-      { label: "Nuestra hoja de ruta", href: "/#hoja-de-ruta" },
-      { label: "Transparencia", href: "/transparencia" },
-    ],
-  },
-  {
-    label: "Comunidad",
-    links: [
-      { label: "Beneficios", href: "/#valor" },
-      { label: "Eventos", href: "/#eventos" },
-      { label: "Oportunidades", href: "/#eventos" },
-      { label: "Internacional", href: "/#internacional" },
-    ],
-  },
-  {
-    label: "Conocimiento",
-    links: [
-      { label: "Observatorio", href: "/observatorio" },
-      { label: "Papers", href: "/papers" },
-      { label: "Normatividad", href: "/normatividad" },
-    ],
-  },
-  {
-    label: "Actualidad",
-    links: [{ label: "Comunicados", href: "/comunicados" }, { label: "Newsletters", href: "/newsletters" }],
-  },
+  { label: "Conócenos", links: [{ label: "Qué es ACIA", href: "/#pilares" }, { label: "Hoja de ruta", href: "/#hoja-de-ruta" }, { label: "Transparencia", href: "/transparencia" }] },
+  { label: "Afiliación", links: [{ label: "Beneficios", href: "/#valor" }, { label: "Tarifas y planes", href: "/#planes" }, { label: "Universo ACIA", href: "/#universo" }] },
+  { label: "Universo ACIA", links: [{ label: "Descubre Universo ACIA", href: "/#universo" }] },
+  { label: "Oportunidades", links: [{ label: "Eventos", href: "/#eventos" }, { label: "Mesas técnicas y convocatorias", href: "/#oportunidades" }, { label: "Alianzas", href: "/#internacional" }] },
+  { label: "Conocimiento", links: [{ label: "Normatividad", href: "/normatividad" }, { label: "Observatorio", href: "/observatorio" }, { label: "Papers y publicaciones", href: "/papers" }] },
+  { label: "Actualidad", links: [{ label: "Últimas noticias", href: "/#noticias" }, { label: "ACIA al día", href: "/newsletters" }, { label: "Comunicados", href: "/comunicados" }] },
 ] as const;
 
 export const HERO = {
@@ -124,15 +101,15 @@ export const EVENTS = {
   title: "Conectando talento y oportunidades en IA.",
   featured: {
     eyebrow: "Alianza ACIA × América Digital",
-    title: "Un beneficio especial para nuestra comunidad afiliada",
+    title: "Congreso Latinoamericano América Digital 2026",
     description:
-      "Gracias a la alianza entre ACIA y América Digital, nuestros afiliados podrán acceder a un 40 % de descuento en delegación para asistir al 11.º Congreso Latinoamericano de IA, Tecnología y Negocios.",
+      "Actividad finalizada. La alianza contempló un beneficio para afiliados en la edición de septiembre de 2026. No es una convocatoria abierta.",
     details: "9 y 10 de septiembre de 2026 · Espacio Riesco, Santiago de Chile",
     href: "https://congreso.america-digital.com/",
   },
   categories: [
-    "Convocatorias activas",
-    "Próximos eventos",
+    "Convocatorias",
+    "Eventos",
     "Mesas técnicas",
     "Iniciativas internacionales",
   ],
@@ -161,7 +138,7 @@ export const CTA_FINAL = {
   title: "Fortalezcamos juntos el ecosistema de IA en Colombia.",
   cta: [
     { label: "Afíliate ahora", href: "/afiliate", variant: "default" as const },
-    { label: "Contáctanos", href: "#", variant: "outline" as const },
+    { label: "Contáctanos", href: "mailto:contacto@iaencolombia.org", variant: "outline" as const },
   ],
   closing: "Donde la IA se convierte en desarrollo.",
 } as const;

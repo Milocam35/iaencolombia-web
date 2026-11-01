@@ -25,7 +25,7 @@ export default async function NewsletterPage({ params }: { params: Promise<{ slu
   const structured = { '@context': 'https://schema.org', '@type': 'Article', headline: item.title, description: item.summary,
     datePublished: item.first_published_at, dateModified: item.published_at, mainEntityOfPage: `https://iaencolombia.org/newsletters/${item.slug}`,
     author: { '@type': 'Organization', name: 'ACIA' }, publisher: { '@type': 'Organization', name: 'Asociación Colombiana de Inteligencia Artificial' } };
-  return <><Header /><main className="bg-surface px-3 pb-16 pt-32 sm:px-6" data-newsletter-revision={item.revision_id}>
+  return <><Header /><main id="contenido" tabIndex={-1} className="bg-surface px-3 pb-16 pt-32 sm:px-6" data-newsletter-revision={item.revision_id}>
     <div className="mx-auto mb-6 max-w-[980px]"><Link className="text-sm font-semibold text-primary underline" href="/newsletters">← Todas las ediciones</Link></div>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured).replace(/</g, '\\u003c') }} />
     <NewsletterArticle article={item} />

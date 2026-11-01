@@ -14,7 +14,7 @@ export default function AffiliationPaymentResultPage() {
   return (
     <>
       <Header />
-      <main className="relative min-h-screen overflow-hidden bg-surface px-6 pt-32 pb-20">
+      <main id="contenido" tabIndex={-1} className="relative min-h-screen overflow-hidden bg-surface px-6 pt-32 pb-20">
         <div className="pointer-events-none absolute inset-0 gradient-mesh" />
         <div className="pointer-events-none absolute top-20 -right-32 size-96 rounded-full bg-accent/10 blur-3xl" />
         <div className="relative mx-auto max-w-2xl">

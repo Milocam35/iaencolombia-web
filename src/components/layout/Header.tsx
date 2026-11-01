@@ -1,206 +1,213 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import { NAV_GROUPS } from "@/lib/constants";
-import {
-  ADMIN_PLATFORM_URL,
-  AFFILIATION_PATH,
-  MEMBER_PORTAL_URL,
-} from "@/lib/config";
+import { AFFILIATION_PATH, MEMBER_PORTAL_URL } from "@/lib/config";
 
 export function Header() {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
+  const nav = useRef<HTMLElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
+  const closeMenu = () => {
+    dialog.current?.close();
+    setMobileOpen(false);
+    toggle.current?.focus();
+  };
   useEffect(() => {
     if (!mobileOpen) return;
-
-    const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMobileOpen(false);
-    };
-
+    const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", closeOnEscape);
     return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previous;
     };
   }, [mobileOpen]);
-
+  useEffect(() => {
+    const closeDropdowns = (event: Event) => {
+      if (event instanceof KeyboardEvent && event.key !== "Escape") return;
+      nav.current?.querySelectorAll("details[open]").forEach((detail) => {
+        if (
+          event instanceof KeyboardEvent ||
+          !detail.contains(event.target as Node)
+        ) {
+          detail.removeAttribute("open");
+          if (event instanceof KeyboardEvent)
+            detail.querySelector("summary")?.focus();
+        }
+      });
+    };
+    document.addEventListener("keydown", closeDropdowns);
+    document.addEventListener("click", closeDropdowns);
+    const wide = window.matchMedia("(min-width: 1280px)");
+    const resize = () => {
+      if (wide.matches && dialog.current?.open) {
+        dialog.current.close();
+        setMobileOpen(false);
+      }
+    };
+    wide.addEventListener("change", resize);
+    return () => {
+      document.removeEventListener("keydown", closeDropdowns);
+      document.removeEventListener("click", closeDropdowns);
+      wide.removeEventListener("change", resize);
+    };
+  }, []);
   return (
-    <header className="fixed top-0 right-0 left-0 z-50">
-      <div
-        className={`transition-all duration-300 ${
-          scrolled
-            ? "border-b border-border bg-white/90 shadow-sm backdrop-blur-xl"
-            : "bg-transparent"
-        }`}
+    <header className="site-header option3-header">
+      <a
+        className="skip-link"
+        href="#contenido"
+        onClick={() => document.querySelector("main")?.focus()}
       >
-        <nav
-          className="mx-auto flex max-w-screen-xl items-center justify-between px-6 py-3"
-          aria-label="Navegación principal"
-        >
-          {/* Logo only */}
-          <Link href="/" className="cursor-pointer">
-            <Image
-              src="/logos/LOGO ACIA TRANSPARENTE PARA FONDO BLANCO.png"
-              alt="ACIA — Asociación Colombiana de Inteligencia Artificial"
-              width={80}
-              height={80}
-              unoptimized
-              className="transition-transform duration-200 hover:scale-105"
-              priority
-            />
-          </Link>
-
-          {/* Desktop nav */}
-          <ul className="hidden items-center gap-1 lg:flex">
-            {NAV_GROUPS.map((group) => (
-              <li key={group.label} className="group relative">
-                <button
-                  type="button"
-                  className="flex cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  aria-haspopup="true"
-                >
+        Saltar al contenido
+      </a>
+      <nav className="header-inner" aria-label="Navegación principal" ref={nav}>
+        <Link href="/" className="brand-link">
+          <Image
+            src="/logos/LOGO ACIA TRANSPARENTE PARA FONDO BLANCO.png"
+            alt="ACIA — Asociación Colombiana de Inteligencia Artificial"
+            width={180}
+            height={72}
+            priority
+            className="brand-image"
+          />
+        </Link>
+        <ul className="desktop-nav">
+          {NAV_GROUPS.map((group) => (
+            <li key={group.label}>
+              {group.links.length === 1 ? (
+                <a className="nav-direct" href={group.links[0].href}>
                   {group.label}
-                  <svg className="size-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                  </svg>
-                </button>
-                <div className="invisible absolute top-full left-1/2 w-56 -translate-x-1/2 pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                  <ul className="rounded-xl border border-border bg-white p-2 shadow-xl">
-                    {group.links.map((link) => (
-                      <li key={`${group.label}-${link.href}-${link.label}`}>
-                        <a href={link.href} className="block rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                          {link.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-            ))}
-            <li>
-              <a
-                href={ADMIN_PLATFORM_URL}
-                className="block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                Acceso administrativo
-              </a>
-            </li>
-          </ul>
-
-          {/* Desktop actions */}
-          <div className="hidden items-center gap-2 lg:flex">
-            <a
-              href={MEMBER_PORTAL_URL}
-              className="inline-flex cursor-pointer rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:bg-[#031560] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              Mi ACIA
-            </a>
-            <a
-              href={AFFILIATION_PATH}
-              className="inline-flex cursor-pointer rounded-lg border border-primary/20 bg-white/70 px-4 py-2.5 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              Afíliate
-            </a>
-          </div>
-
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="cursor-pointer rounded-md p-2 text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
-            aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-navigation"
-          >
-            <svg
-              className="size-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              {mobileOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </a>
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-              )}
-            </svg>
-          </button>
-        </nav>
-      </div>
-
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="max-h-[calc(100vh-6.5rem)] overflow-y-auto border-b border-border bg-white/98 shadow-lg backdrop-blur-xl lg:hidden"
-            id="mobile-navigation"
-          >
-            <ul className="flex flex-col gap-1 px-6 py-4">
-              {NAV_GROUPS.map((group) => (
-                <li key={group.label} className="border-b border-border/70 pb-2 last:border-0">
-                  <p className="px-3 pt-2 text-[10px] font-bold tracking-[0.2em] text-primary/60 uppercase">{group.label}</p>
-                  <ul className="mt-1 grid grid-cols-2 gap-1">
+                <details className="nav-group">
+                  <summary>
+                    {group.label}
+                    <span aria-hidden="true">⌄</span>
+                  </summary>
+                  <ul>
                     {group.links.map((link) => (
-                      <li key={`${group.label}-${link.href}-${link.label}`}>
+                      <li key={link.href}>
                         <a
                           href={link.href}
-                          onClick={() => setMobileOpen(false)}
-                          className="block cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
+                          onClick={(event) =>
+                            event.currentTarget
+                              .closest("details")
+                              ?.removeAttribute("open")
+                          }
                         >
                           {link.label}
                         </a>
                       </li>
                     ))}
                   </ul>
-                </li>
-              ))}
-              <li>
-                <a
-                  href={ADMIN_PLATFORM_URL}
-                  onClick={() => setMobileOpen(false)}
-                  className="block cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  Acceso administrativo
-                </a>
+                </details>
+              )}
+            </li>
+          ))}
+        </ul>
+        <div className="header-actions">
+          <a href={MEMBER_PORTAL_URL} className="member-access">
+            Mi ACIA <span aria-hidden="true">↗</span>
+          </a>
+          <a
+            href={AFFILIATION_PATH}
+            className="action action-primary header-affiliate"
+          >
+            Afíliate <span aria-hidden="true">↗</span>
+          </a>
+          <button
+            ref={toggle}
+            className="icon-button menu-toggle"
+            type="button"
+            aria-label="Abrir menú"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-navigation"
+            onClick={() => {
+              dialog.current?.showModal();
+              setMobileOpen(true);
+            }}
+          >
+            <span aria-hidden="true">☰</span>
+          </button>
+        </div>
+      </nav>
+      <dialog
+        ref={dialog}
+        id="mobile-navigation"
+        className="mobile-navigation"
+        aria-labelledby="mobile-menu-title"
+        onKeyDown={(event) => {
+          if (event.key !== "Tab") return;
+          const controls = Array.from(
+            event.currentTarget.querySelectorAll<HTMLElement>(
+              "a[href],button:not([disabled])",
+            ),
+          );
+          const first = controls[0],
+            last = controls[controls.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
+        }}
+        onCancel={() => setMobileOpen(false)}
+        onClose={() => setMobileOpen(false)}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) closeMenu();
+        }}
+      >
+        <div className="mobile-menu-heading">
+          <span id="mobile-menu-title">Explora ACIA</span>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={closeMenu}
+            aria-label="Cerrar menú"
+          >
+            ✕
+          </button>
+        </div>
+        <nav aria-label="Navegación móvil">
+          <div className="mobile-menu-actions">
+            <a
+              href={AFFILIATION_PATH}
+              className="action action-primary"
+              onClick={closeMenu}
+            >
+              Afíliate
+            </a>
+            <a
+              href={MEMBER_PORTAL_URL}
+              className="mobile-portal"
+              onClick={closeMenu}
+            >
+              Mi ACIA <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <ul>
+            {NAV_GROUPS.map((group) => (
+              <li className="mobile-group" key={group.label}>
+                <p>{group.label}</p>
+                <ul>
+                  {group.links.map((link) => (
+                    <li key={link.href}>
+                      <a href={link.href} onClick={closeMenu}>
+                        {link.label}
+                        <span aria-hidden="true">↗</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </li>
-              <li className="mt-3 border-t border-border pt-3">
-                <a
-                  href={MEMBER_PORTAL_URL}
-                  onClick={() => setMobileOpen(false)}
-                  className="block cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-[#031560]"
-                >
-                  Mi ACIA
-                </a>
-                <a
-                  href={AFFILIATION_PATH}
-                  onClick={() => setMobileOpen(false)}
-                  className="mt-2 block cursor-pointer rounded-lg border border-primary/20 px-4 py-2.5 text-center text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-muted"
-                >
-                  Afíliate
-                </a>
-              </li>
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ))}
+          </ul>
+        </nav>
+      </dialog>
     </header>
   );
 }

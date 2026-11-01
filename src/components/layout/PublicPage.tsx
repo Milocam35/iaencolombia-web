@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { CircuitPattern } from "@/components/ui/CircuitPattern";
 
 interface PublicPageProps {
   eyebrow: string;
@@ -15,9 +14,8 @@ export function PublicPage({ eyebrow, title, description, children }: PublicPage
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-surface pt-24">
+      <main id="contenido" tabIndex={-1} className="public-content min-h-screen bg-surface pt-24">
         <section className="relative overflow-hidden bg-dark px-6 py-20 sm:py-24">
-          <CircuitPattern />
           <div className="pointer-events-none absolute -top-40 right-0 size-96 rounded-full bg-accent/10 blur-3xl" />
           <div className="relative mx-auto max-w-screen-xl">
             <Link href="/" className="text-xs font-semibold tracking-wide text-accent transition-colors hover:text-white">← Volver al inicio</Link>
