@@ -1,10 +1,17 @@
-# ACIA — Landing Page
+# ACIA — Web pública
 
 Sitio web oficial de la **Asociación Colombiana de Inteligencia Artificial** (ACIA), disponible en [iaencolombia.org](https://iaencolombia.org).
 
+
+**Ajustes de la opción 3 · 1/11/2026:** [resultado, pruebas y fotos seleccionadas](docs/AJUSTES-OPCION3-20261101.md) · [comparación con la versión aprobada](review-acia-opcion3/ajustes-20261101/REVIEW.html). Versión aprobada definitivamente por el propietario el 1/11/2026. Publicación pendiente.
+
+**Opción 3 · revisión local:** [informe y pruebas](docs/OPCION-3-REVISION.md) · [galería antes/después](review-acia-opcion3/REVIEW.html) · [procedencia de imágenes](ASSETS_ACIA_OPCION3.md). Rama aislada `ux/opcion3-20261030`, basada en la segunda iteración autorizada. Sin commit ni despliegue.
+
+**Segunda iteración UX/UI:** [informe, comparación, pruebas y pendientes](docs/ITERACION-2.md). [Primera iteración: archivo de revisión](docs/REVISION-LOCAL.md). Rama `ux/public-redesign-20261028`, base `041d503`. La evidencia histórica se conserva. Para probar sin envíos reales, utilizar el servidor simulado y las instrucciones del informe.
+
 ## Configuración pública
 
-- Accesos canónicos del encabezado: Mi ACIA (`https://mi.iaencolombia.org`) y Admin (`https://admin.iaencolombia.org`), definidos explícitamente en `src/lib/config.ts`.
+- Accesos canónicos (Mi ACIA en encabezado; Admin en pie): Mi ACIA (`https://mi.iaencolombia.org`) y Admin (`https://admin.iaencolombia.org`), definidos explícitamente en `src/lib/config.ts`.
 - `NEXT_PUBLIC_ACIA_API_URL`: URL base pública del backend FastAPI, sin barra final. Es necesaria para enviar el formulario de `/afiliate` y no contiene secretos.
 
 ## Afiliación pública y Bold Checkout V1
@@ -17,7 +24,7 @@ Con pagos habilitados, los siete planes de tarifa fija continúan directamente a
 
 ### Feature gate
 
-- `NEXT_PUBLIC_BOLD_MEMBERSHIP_PAYMENTS_ENABLED=false`: gate frontend equivalente para Next.js a `VITE_BOLD_MEMBERSHIP_PAYMENTS_ENABLED`. Solo el valor literal `true` activa el checkout; ausente, vacío o cualquier otro valor permanece fail-closed.
+- `NEXT_PUBLIC_BOLD_MEMBERSHIP_PAYMENTS_ENABLED=false`: gate frontend equivalente para Next.js a `VITE_BOLD_MEMBERSHIP_PAYMENTS_ENABLED`. Solo `true`, tras normalizar espacios y mayúsculas, activa el checkout; ausente, vacío o cualquier otro valor permanece fail-closed.
 - `NEXT_PUBLIC_BOLD_MEMBERSHIP_PAYMENTS_SANDBOX_NOTICE_ENABLED=false`: muestra la indicación discreta de sandbox únicamente cuando se habilita explícitamente. Nunca se infiere el ambiente mediante la identity key.
 
 Con el gate principal desactivado, la landing conserva el copy tradicional de sus CTA y no se carga ni abre Bold. Los planes de tarifa fija muestran que el pago no está disponible y bloquean el envío antes de registrar un prospecto; no se convierten en solicitudes sin pago. Comunidad / Freemium y Gran empresa conservan su solicitud. La habilitación es una variable de build/deploy de Vercel; no contiene secretos. El gate frontend no sustituye `BOLD_PAYMENTS_ENABLED` ni `online_payment_enabled` del backend.
@@ -53,194 +60,31 @@ No activar los flags frontend en producción hasta completar prueba E2E sandbox,
 
 ---
 
-## Stack Tecnológico
+## Interfaz pública
 
-| Tecnología | Versión | Rol |
-|---|---|---|
-| Next.js | 16.1.6 | Framework principal (App Router) |
-| React | 19.2.3 | UI runtime |
-| TypeScript | ^5 | Tipado estático |
-| Tailwind CSS | ^4 | Estilos (CSS-first, sin `tailwind.config.ts`) |
-| Framer Motion | ^12 | Animaciones |
-| CVA | ^0.7 | Variantes de componentes |
-| clsx + tailwind-merge | ^2 / ^3 | Composición de clases |
+Next.js 16.1.6 (App Router), React 19.2.3, TypeScript y Tailwind CSS 4. Paleta institucional `#080820`, `#041D77`, `#4EC7F0`. Se conservan Plus Jakarta Sans y JetBrains Mono; los énfasis editoriales usan Georgia.
 
----
+- `src/app/page.tsx`: composición de portada; mantiene las rutas existentes y la sección editorial conectada.
+- `src/components/layout`: encabezado, pie y páginas informativas compartidos.
+- `src/components/sections`: hero, ticker, perfiles, beneficios, video, Universo, alianzas, planes y contenido institucional.
+- `src/app/public-experience.css`: diseño responsive, foco, contraste y movimiento reducido.
+- `src/data/publicExperience.ts`: noticias editoriales, alianzas y recurso audiovisual pendiente.
+- `src/lib/membershipPlans.ts`: fuente comercial existente, sin modificaciones.
+- `src/lib/newsletters.ts`, `community.ts`, `newsletterPreferences.ts`: contratos existentes, sin modificaciones.
+- `scripts/public-experience.browser.cjs`: QA local con bloqueo de red externa y envíos interceptados.
+- `scripts/review`: servidor de fixtures de solo lectura e integridad de archivos críticos.
 
-## Estructura del Proyecto
-
-```
-iaencolombia-web/
-├── public/
-│   ├── logos/                        # Variantes del logo ACIA
-│   │   ├── ACIA-GIFT.gif             # Logo animado (header)
-│   │   ├── LOGO ACIA CIRCULAR FONDO AZUL OSCURO.png    # Favicon
-│   │   ├── LOGO ACIA CIRCULAR FONDO BLANCO.png
-│   │   ├── LOGO ACIA RECTANGULAR FONDO AZUL OSCURO.png
-│   │   ├── LOGO ACIA RECTANGULAR FONDO BLANCO.png
-│   │   ├── LOGO ACIA TRANSPARENTE PARA FONDO AZUL OSCURO.png  # Footer
-│   │   └── LOGO ACIA TRANSPARENTE PARA FONDO BLANCO.png       # Hero
-│   └── sections/                     # Imágenes de secciones (WebP)
-│       ├── NewStage.webp
-│       ├── Gobernanza.webp
-│       ├── Ecosistema.webp
-│       ├── Proyectos.webp
-│       ├── Convocatoria.webp
-│       ├── Eventos.webp
-│       ├── Espacio_trabajo.webp
-│       └── International.webp
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx                # Root layout, metadatos SEO, fuentes
-│   │   ├── page.tsx                  # Página principal (composición de secciones)
-│   │   └── globals.css               # @theme Tailwind v4, keyframes, utilidades
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├── Header.tsx            # Navegación fija, logo animado
-│   │   │   └── Footer.tsx            # Footer institucional oscuro
-│   │   ├── sections/
-│   │   │   ├── HeroSection.tsx       # Hero unificado: logo, título, imagen + nueva etapa, CTAs
-│   │   │   ├── PillarsSection.tsx    # Carrusel de los 3 pilares de ACIA
-│   │   │   ├── ValueSection.tsx      # Beneficios afiliados (terminal typewriter)
-│   │   │   ├── EventsSection.tsx     # Tarjetas de eventos con imágenes
-│   │   │   ├── GovernanceSection.tsx  # Internacional (marquee aliados) + Gobernanza (principios)
-│   │   │   └── CTASection.tsx        # Llamado a la acción final
-│   │   └── ui/
-│   │       ├── Button.tsx            # Variantes CVA: default, secondary, outline, ghost
-│   │       ├── Container.tsx         # Contenedor centrado con max-width
-│   │       ├── SectionWrapper.tsx    # Wrapper con padding y animación de entrada
-│   │       ├── FloatingDots.tsx      # Fondo de puntos flotantes animados (Canvas)
-│   │       └── CircuitPattern.tsx    # Fondo de circuito electrónico (Canvas)
-│   ├── lib/
-│   │   ├── utils.ts                  # Utilidad: clsx + tailwind-merge (cn)
-│   │   └── constants.ts              # Todo el contenido textual del sitio
-│   └── types/                        # Tipos TypeScript compartidos
-└── CLAUDE.md                         # Guía de desarrollo e identidad de marca
-```
-
----
-
-## Identidad Visual
-
-### Colores Corporativos
-
-| Token CSS | Hex | Uso |
-|---|---|---|
-| `--color-dark` | `#080820` | Fondo institucional oscuro |
-| `--color-primary` | `#041D77` | Azul corporativo principal |
-| `--color-accent` | `#4EC7F0` | Azul celeste — letras I y A del logo |
-| `--color-background` | `#FFFFFF` | Fondo claro |
-| `--color-foreground` | `#080820` | Texto sobre fondo claro |
-
-### Regla del Logo
-
-- **Sobre blanco:** A y C iniciales → `#041D77` · I y A final → `#4EC7F0`
-- **Sobre azul oscuro:** A y C iniciales → `#FFFFFF` · I y A final → `#4EC7F0`
-- La I y la A finales **siempre** conservan `#4EC7F0`
-
-### Tipografía
-
-| Variable CSS | Fuente | Uso |
-|---|---|---|
-| `--font-sans` | Plus Jakarta Sans | Cuerpo, títulos, UI general |
-| `--font-mono` | JetBrains Mono | Terminal, bloques de código |
-
----
-
-## Secciones de la Landing
-
-| Sección | ID | Descripción |
-|---|---|---|
-| Header | — | Navegación fija. Logo GIF animado. Scroll activo. |
-| Hero | `#hero` | Logo centrado, título, badge "Nueva etapa 2026". Split: imagen NewStage + texto nueva etapa + CTAs. Fondo claro con FloatingDots. |
-| Qué es ACIA | `#pilares` | Carrusel de los 3 pilares: Gobernanza, Ecosistema, Proyectos. Auto-avance cada 6s. Fondo claro con FloatingDots. |
-| Afiliados | `#valor` | Terminal con efecto typewriter. Lista de beneficios de afiliación. Fondo oscuro con CircuitPattern. |
-| Eventos | `#eventos` | 4 tarjetas con imagen de cabecera: Convocatorias, Eventos, Mesas técnicas, Internacional. Fondo claro con FloatingDots. |
-| Gobernanza | `#gobernanza` | Proyección internacional (marquee aliados) + divider + Gobernanza responsable (principios 2×2). Fondo oscuro con CircuitPattern. |
-| Afíliate | `#cta` | CTA final con dos botones. Fondo oscuro con CircuitPattern. |
-| Footer | — | Logo ACIA, columnas de navegación, información de contacto. Fondo oscuro. |
-
----
-
-## Componentes UI Reutilizables
-
-### `Button`
-Variantes via CVA: `default` (azul primario), `secondary` (azul claro), `outline` (borde), `ghost` (sin fondo). Tamaños: `sm`, `md`, `lg`.
-
-### `Container`
-`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`. Wrapper estándar de ancho máximo.
-
-### `SectionWrapper`
-Envuelve secciones con `py-24 sm:py-32`. Animación `fadeUp` con `useInView` de Framer Motion. Soporte para fondos: `"white"` | `"surface"` | `"dark"`.
-
-### `FloatingDots`
-Canvas API. Genera puntos animados con trayectorias flotantes aleatorias. Colores ACIA: `#4EC7F0` y `#041D77`. Optimizado con IntersectionObserver (pausa fuera de viewport) y throttle a ~30fps. Usado en HeroSection, PillarsSection y EventsSection.
-
-### `CircuitPattern`
-Canvas API. Dibuja nodos y trazos de circuito electrónico cubriendo toda la sección padre. Detecta el contenedor con `closest("section") ?? closest("footer")`. Optimizado con IntersectionObserver y throttle a ~30fps. Usado en ValueSection, GovernanceSection y CTASection.
-
----
-
-## Animaciones
-
-| Animación | Implementación | Secciones |
-|---|---|---|
-| Fade-up en scroll | Framer Motion `useInView` | Todas las secciones |
-| Carrusel de pilares | `AnimatePresence` + `slideVariants` | PillarsSection |
-| Typewriter terminal | Intervalo JS + `useInView` | ValueSection |
-| Marquee infinito | `motion.div` con `animate={{ x: ["0%", "-50%"] }}` | GovernanceSection (aliados) |
-| Puntos flotantes | Canvas API + `requestAnimationFrame` | HeroSection, PillarsSection, EventsSection |
-| Circuito electrónico | Canvas API + `requestAnimationFrame` | ValueSection, GovernanceSection, CTASection |
-
-> **Nota Tailwind v4:** Los `@keyframes` deben declararse **fuera** del bloque `@theme {}` para funcionar correctamente a nivel global.
-
----
-
-## Metadatos SEO
-
-```ts
-title:       "ACIA - Asociación Colombiana de Inteligencia Artificial"
-description: "Articulamos el ecosistema de inteligencia artificial en Colombia..."
-keywords:    ["inteligencia artificial", "Colombia", "ACIA", "IA", "gobernanza", ...]
-openGraph:   { url: "https://iaencolombia.org", locale: "es_CO", type: "website" }
-twitter:     { card: "summary_large_image" }
-favicon:     "/logos/LOGO ACIA CIRCULAR FONDO AZUL OSCURO.png"
-lang:        "es"
-```
-
----
+El menú prioriza Afíliate. Mi ACIA conserva su destino y el acceso administrativo queda en el pie. Marketplace se identifica en construcción y Universo como plataforma existente. El video permanece oculto en producción hasta aprobación del material.
 
 ## Comandos
 
-```bash
-# Instalar dependencias
-npm install
-
-# Servidor de desarrollo (http://localhost:3000)
-npm run dev
-
-# Build de producción
-npm run build
-
-# Servidor de producción
-npm start
-
-# Linting
+```powershell
+npm ci
 npm run lint
-
-# Verificación de la jerarquía Mi ACIA / Admin
+npx tsc --noEmit --incremental false
+npm test
 npm run test:member-access
+npm run build
 ```
 
----
-
-## Convenciones de Desarrollo
-
-- **Contenido textual:** todo vive en [`src/lib/constants.ts`](src/lib/constants.ts). No hardcodear strings en componentes.
-- **Imágenes:** logos en `public/logos/`, fotos de secciones en `public/sections/` (formato WebP).
-- **GIFs:** usar `unoptimized` en `next/image` para preservar la animación.
-- **Idioma:** el sitio es **español únicamente** (`lang="es"`). No agregar inglés.
-- **Tailwind:** no usar `tailwind.config.ts`. Toda la configuración es CSS-first en `globals.css` con `@theme`.
-- **`"use client"`:** solo agregar cuando el componente usa estado (`useState`), efectos (`useEffect`) o eventos del navegador. Componentes de solo presentación no lo necesitan.
-- **Imágenes del logo:** respetar las variantes según el fondo (oscuro / blanco). Ver sección de Identidad Visual.
-- **Canvas animations:** usar IntersectionObserver para pausar cuando están fuera del viewport. Throttle a ~30fps.
+Para desarrollo, compilación y pruebas visuales sin efectos reales, seguir [Revisión local](docs/REVISION-LOCAL.md#repetir-la-revisión-local). Los metadatos, canonical, noindex, consentimiento y comportamiento de afiliación/pago se conservan.

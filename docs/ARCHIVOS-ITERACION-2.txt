@@ -1,0 +1,27 @@
+Cambios exclusivos frente al respaldo de la primera iteración (LF normalizado).
+
+MODIFICADO	docs/ARCHIVOS-MODIFICADOS.txt
+MODIFICADO	README.md
+NUEVO	docs/ARCHIVOS-ITERACION-2.txt
+NUEVO	docs/ENLACES-ITERACION-2.md
+NUEVO	docs/ITERACION-2.md
+NUEVO	scripts/iteration-2.browser.cjs
+MODIFICADO	scripts/public-experience.browser.cjs
+MODIFICADO	scripts/public-experience.test.mjs
+MODIFICADO	src/app/page.tsx
+MODIFICADO	src/app/public-experience.css
+MODIFICADO	src/components/layout/Header.tsx
+MODIFICADO	src/components/newsletter/NewsletterLanding.tsx
+MODIFICADO	src/components/sections/AlliancesSection.tsx
+MODIFICADO	src/components/sections/EventsSection.tsx
+MODIFICADO	src/components/sections/HeroSection.tsx
+MODIFICADO	src/components/sections/InstitutionalSections.tsx
+MODIFICADO	src/components/sections/InstitutionalVideo.tsx
+MODIFICADO	src/components/sections/MembershipPlansSection.tsx
+MODIFICADO	src/components/sections/MembershipProfile.tsx
+MODIFICADO	src/components/sections/NewsTicker.tsx
+MODIFICADO	src/components/sections/PillarsSection.tsx
+MODIFICADO	src/components/sections/UniverseSection.tsx
+MODIFICADO	src/components/sections/ValueSection.tsx
+MODIFICADO	src/data/publicExperience.ts
+MODIFICADO	src/lib/constants.ts

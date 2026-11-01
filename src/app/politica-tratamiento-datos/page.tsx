@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
   return (
     <>
       <Header />
-      <main className="relative overflow-hidden bg-surface pt-28 pb-24">
+      <main id="contenido" tabIndex={-1} className="privacy-page relative overflow-hidden bg-surface pt-28 pb-24">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[linear-gradient(135deg,#041D77_0%,#06113d_64%,#080820_100%)]" />
         <div className="pointer-events-none absolute top-20 right-[8%] size-72 rounded-full border border-white/10" />
         <div className="pointer-events-none absolute top-52 right-[18%] size-2 rounded-full bg-accent shadow-[0_0_35px_10px_rgba(78,199,240,0.25)]" />
