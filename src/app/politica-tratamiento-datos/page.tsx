@@ -6,6 +6,7 @@ import {
   PRIVACY_POLICY,
   PRIVACY_POLICY_DOCUMENT_VERSION,
   PRIVACY_POLICY_EFFECTIVE_DATE,
+  COMMUNICATIONS_CLARIFICATION_DATE,
 } from "@/lib/privacyPolicy";
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default function PrivacyPolicyPage() {
             <dl className="grid min-w-64 grid-cols-2 gap-x-7 gap-y-5 border-l border-white/15 pl-6 text-sm">
               <div><dt className="text-[10px] font-bold tracking-[0.18em] text-white/40 uppercase">Versión</dt><dd className="mt-1 font-semibold text-white">{PRIVACY_POLICY_DOCUMENT_VERSION}</dd></div>
               <div><dt className="text-[10px] font-bold tracking-[0.18em] text-white/40 uppercase">Vigencia</dt><dd className="mt-1 font-semibold text-white">{PRIVACY_POLICY_EFFECTIVE_DATE}</dd></div>
+              <div className="col-span-2"><dt className="text-[10px] font-bold tracking-[0.18em] text-white/40 uppercase">Aclaración sobre comunicaciones</dt><dd className="mt-1 font-semibold text-white">{COMMUNICATIONS_CLARIFICATION_DATE}</dd></div>
             </dl>
           </div>
         </header>

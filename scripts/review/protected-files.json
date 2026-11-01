@@ -4,7 +4,7 @@
   "files": {
     "src/lib/config.ts": "77d7cc0ccffd9cafed6e1e42cc91609e4739e053f8528416af61803e9ad0928d",
     "src/lib/membershipPlans.ts": "848ce9b9d2d01a218c62585c55d9b9ae3790d63aa9c257e74edef8eb2bce0e2d",
-    "src/lib/privacyPolicy.ts": "ed215375adaea096600bc3b4424b37a068a3a269447264fab6f3464bb7336456",
+    "src/lib/privacyPolicy.ts": "ecd764f1585157eafae55b9f444d06b57875b441d3a0420d69544a44a1304fa4",
     "src/lib/boldCheckout.ts": "9ca5247ba1217149f2074debc38c5c75efc594b0c1bf1af9af533ea8e3af7d48",
     "src/lib/boldCheckoutFlow.ts": "bec68e6e2e5f73ad0ff64c1dee522a02346db534aa8a75fc3c8c25626ba3d46c",
     "src/lib/paymentSession.ts": "3d28da10065c87f3757c9a95b6b8ba10da9940b0144e900ed4077423cbeed0d6",
