@@ -18,8 +18,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Block high and critical production dependency vulnerabilities
+        run: npm audit --omit=dev --audit-level=high
       - run: npm test
       - run: npm run test:member-access
       - run: npm run lint
       - run: npm run build
+      - name: Smoke test local Next runtime and image optimizer
+        run: node scripts/next-runtime-smoke.mjs
       - run: git diff --check

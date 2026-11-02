@@ -13,7 +13,7 @@
     "src/components/payments/PaymentResult.tsx": "730699b34ea5831474aa3eb14fb393af53be8506f7900e7ce3085bf10a1d8354",
     "src/lib/community.ts": "8b63c21fabf736a2b528a178ccc26293feee4fc3d6f3f2a7d0931f4d7936f55a",
     "src/lib/newsletterPreferences.ts": "cbc6f2265578cb26aae4ed8e59fcf0e352475574316d3661e1b26fd7b0486a97",
-    "src/lib/newsletters.ts": "470b10b92d301f4848a4b6800ec633e8a8c3a017a6cf33c755576a1f6ca24efd",
+    "src/lib/newsletters.ts": "17558e491f03004a1180f44151fc2ef9d7fe6eee0dc67cc2b0f7fc5aaf1ec44d",
     "src/components/forms/CommunityPreferences.tsx": "3b286063406f097cfb875183ea0e93ea87474ce8f4935ec20045e6e795f2132d",
     "src/components/newsletter/NewsletterPreferences.tsx": "74b7419bd07e2298882a93547b697dc29ca29098e5a54af0f07eecc5f00c6e9d",
     "src/components/forms/AffiliationForm.tsx": "c07ba8aa22ac291990c8c2e33759130dc6ed19c3b6fa777bd40f547cc3e865ee",
