@@ -6,6 +6,7 @@ export interface PublicNewsletter {
   id: string; slug: string; revision_id: string; version: number; title: string;
   summary: string; published_at: string; first_published_at: string; url: string;
   content_markdown: string;
+  image_url?: string | null; image_alt?: string;
 }
 
 async function read(path: string): Promise<unknown> {
