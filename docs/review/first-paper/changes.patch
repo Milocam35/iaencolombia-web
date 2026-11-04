@@ -1,0 +1,414 @@
+diff --git a/src/app/papers/page.tsx b/src/app/papers/page.tsx
+index 4c343c2..7b2bc4d 100644
+--- a/src/app/papers/page.tsx
++++ b/src/app/papers/page.tsx
+@@ -1,15 +1,35 @@
+ import type { Metadata } from "next";
+ import { EmptyState, PublicPage } from "@/components/layout/PublicPage";
+ import { PUBLICATIONS, PUBLICATION_TYPES } from "@/data/papers";
++import { PublicationCard } from "@/components/papers/PublicationCard";
+ 
+ export const metadata: Metadata = {
+   title: "Papers y publicaciones ACIA",
+   description: "Repositorio institucional de investigación, análisis técnico y documentos de política pública de ACIA.",
++  alternates: { canonical: "https://www.iaencolombia.org/papers" },
++  openGraph: {
++    type: "website",
++    title: PUBLICATIONS[0]?.title ?? "Papers y publicaciones ACIA",
++    description: PUBLICATIONS[0]?.abstract ?? "Publicaciones de ACIA.",
++    url: "https://www.iaencolombia.org/papers",
++    siteName: "ACIA",
++    locale: "es_CO",
++    images: [{ url: "https://www.iaencolombia.org/papers/gobernanza-ia-infraestructura-economica-portada.png", alt: "Portada original del paper de ACIA" }],
++  },
++  twitter: {
++    card: "summary",
++    title: PUBLICATIONS[0]?.title ?? "Papers y publicaciones ACIA",
++    description: "Gobernanza de IA, riesgos sistémicos y confianza en los mercados. Paper de ACIA disponible en MPRA.",
++    images: ["https://www.iaencolombia.org/papers/gobernanza-ia-infraestructura-economica-portada.png"],
++  },
+ };
+ 
+ export default function PapersPage() {
+   return (
+     <PublicPage eyebrow="Conocimiento ACIA" title="Papers y publicaciones ACIA" description="Repositorio institucional para investigación, análisis técnico y documentos orientados a fortalecer las decisiones sobre inteligencia artificial.">
++      {PUBLICATIONS.length > 0 && <section aria-label="Publicaciones de ACIA" className="mb-14 space-y-8">
++        {PUBLICATIONS.map(publication => <PublicationCard key={publication.slug} publication={publication} />)}
++      </section>}
+       <section aria-labelledby="publication-types-title">
+         <h2 id="publication-types-title" className="text-2xl font-extrabold text-primary sm:text-3xl">Colecciones editoriales</h2>
+         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+diff --git a/src/components/sections/InstitutionalSections.tsx b/src/components/sections/InstitutionalSections.tsx
+index 274f7de..6e1afb7 100644
+--- a/src/components/sections/InstitutionalSections.tsx
++++ b/src/components/sections/InstitutionalSections.tsx
+@@ -50,7 +50,7 @@ export function KnowledgeSection() {
+               Observatorio <span>En desarrollo ↗</span>
+             </a>
+             <a href={ACIA_PAPERS_URL}>
+-              Papers <span>En preparación ↗</span>
++              Papers <span>Ver publicaciones ↗</span>
+             </a>
+           </div>
+         </div>
+diff --git a/src/data/papers.ts b/src/data/papers.ts
+index 3069d88..edf07fe 100644
+--- a/src/data/papers.ts
++++ b/src/data/papers.ts
+@@ -7,18 +7,24 @@ export type PublicationType =
+ export interface AciaPublication {
+   title: string;
+   slug: string;
+-  publicationType: PublicationType;
++  publicationType?: PublicationType;
+   authors: string[];
+   abstract: string;
+   abstractEn?: string;
+   keywords: string[];
+-  publicationDate: string;
+-  version: string;
+-  aciaIdentifier: string;
++  institution: string;
++  year: number;
++  language: string;
++  depositedAt: string;
++  repository: { name: string; url: string; identifier: string };
++  coverUrl?: string;
++  publicationDate?: string;
++  version?: string;
++  aciaIdentifier?: string;
+   pdfUrl: string;
+   citation: string;
+   methodology?: string;
+-  reviewStatus: string;
++  reviewStatus?: string;
+   fundingStatement?: string;
+   conflictOfInterestStatement?: string;
+   license?: string;
+@@ -31,4 +37,24 @@ export const PUBLICATION_TYPES: ReadonlyArray<{ label: PublicationType; prefix:
+   { label: "Technical Note", prefix: "ACIA-TN-YYYY-NNN" },
+ ];
+ 
+-export const PUBLICATIONS: AciaPublication[] = [];
++export const PUBLICATIONS: AciaPublication[] = [
++  {
++    title: "Gobernanza de la IA como infraestructura económica: riesgos sistémicos, intermediación institucional y confianza en los mercados",
++    slug: "gobernanza-ia-infraestructura-economica",
++    authors: ["Angel Varela", "Alejandro Colmenares", "Juan Camilo Cortes"],
++    institution: "Asociación Colombiana de Inteligencia Artificial — ACIA",
++    year: 2026,
++    language: "Español",
++    abstract: "Este documento analiza la gobernanza de la inteligencia artificial como una infraestructura económica que transforma los mercados, las instituciones y la toma de decisiones. A partir de marcos internacionales y del contexto colombiano, examina oportunidades y riesgos de su adopción, con especial atención a los mercados financieros. Plantea la importancia de la supervisión, la auditoría algorítmica, la trazabilidad y la interoperabilidad para fortalecer la confianza y la capacidad institucional.",
++    keywords: ["Gobernanza de IA", "Economía", "Riesgos sistémicos", "Mercados financieros", "Colombia"],
++    depositedAt: "2026-09-30",
++    repository: {
++      name: "Munich Personal RePEc Archive — MPRA",
++      url: "https://mpra.ub.uni-muenchen.de/131077/",
++      identifier: "MPRA Paper n.º 131077",
++    },
++    pdfUrl: "/papers/gobernanza-ia-infraestructura-economica-mpra-131077.pdf",
++    coverUrl: "/papers/gobernanza-ia-infraestructura-economica-portada.png",
++    citation: "Varela, A., Colmenares, A., y Cortes, J. C. (2026). Gobernanza de la IA como infraestructura económica: riesgos sistémicos, intermediación institucional y confianza en los mercados. Asociación Colombiana de Inteligencia Artificial — ACIA. MPRA Paper n.º 131077. https://mpra.ub.uni-muenchen.de/131077/",
++  },
++];
+diff --git a/src/components/papers/PublicationCard.tsx b/src/components/papers/PublicationCard.tsx
+new file mode 100644
+index 0000000..478e47b
+--- /dev/null
++++ b/src/components/papers/PublicationCard.tsx
+@@ -0,0 +1,46 @@
++import Image from "next/image";
++import type { AciaPublication } from "@/data/papers";
++import { PublicationCitation } from "./PublicationCitation";
++
++const depositDate = (date: string) => new Intl.DateTimeFormat("es-CO", {
++  day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
++}).format(new Date(`${date}T00:00:00Z`));
++
++export function PublicationCard({ publication }: { publication: AciaPublication }) {
++  const titleId = `paper-${publication.slug}`;
++  return <article aria-labelledby={titleId} className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
++    <div className="h-1.5 bg-accent" />
++    <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-12 lg:p-10">
++      <div className="min-w-0">
++        <p className="font-mono text-xs font-bold leading-6 tracking-wide text-primary">{publication.publicationType ?? "Paper de ACIA"} · Disponible en MPRA</p>
++        <h2 id={titleId} className="mt-4 text-2xl font-extrabold leading-snug tracking-tight text-primary sm:text-3xl">{publication.title}</h2>
++        <p className="mt-5 text-sm font-semibold leading-7 text-foreground">{publication.authors.join(" · ")}</p>
++        <p className="mt-1 text-sm leading-7 text-muted-foreground">{publication.institution}</p>
++        <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-4 text-sm">
++          <div><dt className="text-xs font-semibold text-muted-foreground">Año</dt><dd className="mt-1 font-semibold text-primary">{publication.year}</dd></div>
++          <div><dt className="text-xs font-semibold text-muted-foreground">Idioma</dt><dd className="mt-1 text-foreground">{publication.language}</dd></div>
++          <div><dt className="text-xs font-semibold text-muted-foreground">Depósito en MPRA</dt><dd className="mt-1 text-foreground"><time dateTime={publication.depositedAt}>{depositDate(publication.depositedAt)}</time></dd></div>
++        </dl>
++        <p className="mt-5 text-sm font-bold text-primary">{publication.repository.identifier}</p>
++        <p className="mt-1 text-xs leading-6 text-muted-foreground">{publication.repository.name}</p>
++        <h3 className="mt-7 text-sm font-bold text-primary">Resumen</h3>
++        <p className="mt-3 text-sm leading-7 text-muted-foreground sm:text-base sm:leading-8">{publication.abstract}</p>
++        <ul aria-label="Temas del paper" className="mt-6 flex flex-wrap gap-2">
++          {publication.keywords.map(keyword => <li key={keyword} className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-primary">{keyword}</li>)}
++        </ul>
++        <nav aria-label={`Acceso al documento: ${publication.title}`} className="mt-8 flex flex-wrap items-center gap-3">
++          <a href={publication.pdfUrl} target="_blank" rel="noopener noreferrer" className="rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#031560]">Leer PDF<span className="sr-only"> (abre una pestaña nueva)</span></a>
++          <a href={publication.pdfUrl} download className="rounded-lg border border-primary/20 px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary">Descargar PDF</a>
++          <a href={publication.repository.url} target="_blank" rel="noopener noreferrer" className="rounded-lg px-2 py-3 text-sm font-semibold text-primary underline decoration-accent underline-offset-4">Ver publicación en MPRA<span className="sr-only"> (abre una pestaña nueva)</span></a>
++        </nav>
++        <PublicationCitation citation={publication.citation} />
++      </div>
++      {publication.coverUrl && <figure className="mx-auto w-full max-w-[240px] self-start lg:sticky lg:top-28">
++        <a href={publication.pdfUrl} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-border bg-white shadow-sm" aria-label="Leer PDF desde su portada (abre una pestaña nueva)">
++          <Image src={publication.coverUrl} alt={`Portada interna del documento original: ${publication.title}`} width={640} height={906} sizes="240px" className="h-auto w-full rounded-lg" />
++        </a>
++        <figcaption className="mt-3 text-center text-xs leading-5 text-muted-foreground">Portada del documento original</figcaption>
++      </figure>}
++    </div>
++  </article>;
++}
+diff --git a/src/components/papers/PublicationCitation.tsx b/src/components/papers/PublicationCitation.tsx
+new file mode 100644
+index 0000000..617919c
+--- /dev/null
++++ b/src/components/papers/PublicationCitation.tsx
+@@ -0,0 +1,29 @@
++"use client";
++
++import { useRef, useState } from "react";
++
++export function PublicationCitation({ citation }: { citation: string }) {
++  const reference = useRef<HTMLTextAreaElement>(null);
++  const [message, setMessage] = useState("");
++  const copy = async () => {
++    try {
++      await navigator.clipboard.writeText(citation);
++      setMessage("Referencia copiada.");
++    } catch {
++      reference.current?.focus();
++      reference.current?.select();
++      setMessage("Referencia seleccionada. Puedes copiarla con tu teclado.");
++    }
++  };
++
++  return <div className="mt-8 border-t border-border pt-6">
++    <label className="block text-sm font-bold text-primary">
++      Referencia bibliográfica
++      <textarea ref={reference} readOnly value={citation} rows={5} className="mt-3 block w-full resize-y rounded-lg border border-border bg-surface p-4 text-sm font-normal leading-6 text-foreground" />
++    </label>
++    <div className="mt-3 flex flex-wrap items-center gap-3">
++      <button type="button" onClick={() => void copy()} className="rounded-lg border border-primary/20 bg-white px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-secondary">Copiar referencia</button>
++      <span role="status" className="text-sm text-muted-foreground">{message}</span>
++    </div>
++  </div>;
++}
+diff --git a/scripts/papers.test.mjs b/scripts/papers.test.mjs
+new file mode 100644
+index 0000000..9f57e4e
+--- /dev/null
++++ b/scripts/papers.test.mjs
+@@ -0,0 +1,97 @@
++import assert from 'node:assert/strict';
++import test from 'node:test';
++import { readFileSync } from 'node:fs';
++import { createHash } from 'node:crypto';
++import { createRequire } from 'node:module';
++import { resolve } from 'node:path';
++import ts from 'typescript';
++import React from 'react';
++import { renderToStaticMarkup } from 'react-dom/server';
++import { PUBLICATIONS, PUBLICATION_TYPES } from '../src/data/papers.ts';
++
++const root = resolve(import.meta.dirname, '..');
++const require = createRequire(import.meta.url);
++const source = file => readFileSync(resolve(root, file), 'utf8');
++function compile(file, dependencies = {}) {
++  const output = ts.transpileModule(source(file), { compilerOptions: {
++    module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX,
++    target: ts.ScriptTarget.ES2022, esModuleInterop: true,
++  } }).outputText;
++  const exports = {};
++  new Function('require', 'exports', output)(name => dependencies[name] ?? require(name), exports);
++  return exports;
++}
++const citation = compile('src/components/papers/PublicationCitation.tsx');
++const { PublicationCard } = compile('src/components/papers/PublicationCard.tsx', { './PublicationCitation': citation });
++const { default: PapersPage, metadata } = compile('src/app/papers/page.tsx', {
++  '@/components/layout/PublicPage': {
++    PublicPage: ({ children }) => React.createElement('main', null, children),
++    EmptyState: ({ title }) => React.createElement('p', null, title),
++  },
++  '@/data/papers': { PUBLICATIONS, PUBLICATION_TYPES },
++  '@/components/papers/PublicationCard': { PublicationCard },
++});
++const paper = PUBLICATIONS[0];
++
++test('el primer paper conserva autoría interna y depósito, sin datos editoriales inventados', () => {
++  assert.equal(PUBLICATIONS.length, 1);
++  assert.deepEqual(paper.authors, ['Angel Varela', 'Alejandro Colmenares', 'Juan Camilo Cortes']);
++  assert.equal(paper.year, 2026);
++  assert.equal(paper.depositedAt, '2026-09-30');
++  assert.equal(paper.language, 'Español');
++  assert.equal(paper.repository.identifier, 'MPRA Paper n.º 131077');
++  for (const key of ['publicationType', 'aciaIdentifier', 'version', 'license', 'reviewStatus', 'publicationDate']) assert.equal(paper[key], undefined);
++  assert.equal(new Set(PUBLICATIONS.map(item => item.slug)).size, PUBLICATIONS.length);
++  assert.equal(new Set(PUBLICATIONS.map(item => item.repository.url)).size, PUBLICATIONS.length);
++});
++
++test('la copia pública conserva todos los bytes del PDF original de MPRA', () => {
++  const bytes = readFileSync(resolve(root, 'public', paper.pdfUrl.slice(1)));
++  assert.equal(bytes.subarray(0, 8).toString(), '%PDF-1.7');
++  assert.equal(bytes.length, 1137472);
++  assert.equal(createHash('sha256').update(bytes).digest('hex'), 'd061b9cd2ddc90e391181e164f4dacb057e7996d9a9cf88d9a2ef10486307aa4');
++  assert(readFileSync(resolve(root, 'public', paper.coverUrl.slice(1))).length > 0);
++});
++
++test('ficha pública ofrece lectura, descarga real en el mismo origen y registro externo seguro', () => {
++  const html = renderToStaticMarkup(React.createElement(PublicationCard, { publication: paper }));
++  assert.match(html, /Paper de ACIA.*Disponible en MPRA/);
++  assert.match(html, /Depósito en MPRA/);
++  assert.match(html, /<time dateTime="2026-09-30">30 de septiembre de 2026<\/time>/);
++  assert.match(html, /href="\/papers\/gobernanza-ia-infraestructura-economica-mpra-131077.pdf" download=""/);
++  assert.match(html, /href="https:\/\/mpra.ub.uni-muenchen.de\/131077\/" target="_blank" rel="noopener noreferrer"/);
++  assert(html.includes(`alt="Portada interna del documento original: ${paper.title}"`));
++  assert.match(html, /Leer PDF/);
++  assert.match(html, /Descargar PDF/);
++  assert(html.indexOf('Angel Varela') < html.indexOf('Alejandro Colmenares'));
++  assert(html.indexOf('Alejandro Colmenares') < html.indexOf('Juan Camilo Cortes'));
++});
++
++test('la referencia es seleccionable sin JavaScript y el botón ofrece fallback de portapapeles', () => {
++  const html = renderToStaticMarkup(React.createElement(citation.PublicationCitation, { citation: paper.citation }));
++  assert.match(html, /<textarea[^>]*readOnly/);
++  assert.match(html, /MPRA Paper n.º 131077/);
++  assert.match(html, /Copiar referencia/);
++  assert.match(html, /role="status"/);
++  assert.match(source('src/components/papers/PublicationCitation.tsx'), /reference.current\?\.select\(\)/);
++});
++
++test('papers renderiza la publicación una sola vez y conserva las cuatro colecciones sin estado vacío', () => {
++  const html = renderToStaticMarkup(React.createElement(PapersPage));
++  assert.equal((html.match(/<article aria-labelledby="paper-/g) ?? []).length, 1);
++  assert.doesNotMatch(html, /Repositorio institucional en preparación|Aún no hay publicaciones cargadas/);
++  for (const type of PUBLICATION_TYPES) assert(html.includes(`${type.label}s`));
++});
++
++test('SEO público describe el paper sin fecha de despliegue ni DOI, licencia o revisión ficticios', () => {
++  assert.equal(metadata.alternates.canonical, 'https://www.iaencolombia.org/papers');
++  assert.equal(metadata.openGraph.title, paper.title);
++  assert.equal(metadata.twitter.title, paper.title);
++  assert.equal(new URL(metadata.openGraph.images[0].url).protocol, 'https:');
++  assert.doesNotMatch(JSON.stringify(metadata), /datePublished|publishedTime|peer.review|doi.org|Creative Commons/i);
++});
++
++test('la incorporación usa contenido versionado sin APIs de correo, escrituras o autenticación', () => {
++  const code = ['src/data/papers.ts', 'src/app/papers/page.tsx', 'src/components/papers/PublicationCard.tsx', 'src/components/papers/PublicationCitation.tsx'].map(source).join('\n');
++  assert.doesNotMatch(code, /fetch\(|sendEmail|newsletter|outbox|localStorage|sessionStorage|authorization|useSession|memberRequest/);
++});
+diff --git a/scripts/papers-browser.mjs b/scripts/papers-browser.mjs
+new file mode 100644
+index 0000000..5479c13
+--- /dev/null
++++ b/scripts/papers-browser.mjs
+@@ -0,0 +1,105 @@
++// Production-built Next UI, local public GETs only. No login or business writes.
++import assert from 'node:assert/strict';
++import { spawn } from 'node:child_process';
++import { createServer, connect } from 'node:net';
++import { once } from 'node:events';
++import { resolve, join } from 'node:path';
++import { mkdir, readFile, writeFile } from 'node:fs/promises';
++import { pathToFileURL } from 'node:url';
++import { createHash } from 'node:crypto';
++
++const root = resolve(import.meta.dirname, '..');
++const output = join(root, 'docs/review/first-paper');
++await mkdir(output, { recursive: true });
++await mkdir(join(root, '.local-review'), { recursive: true });
++const { chromium } = await import(pathToFileURL(process.env.ACIA_MAIL_PLAYWRIGHT_MODULE).href);
++const reservation = createServer(); reservation.listen(0, '127.0.0.1'); await once(reservation, 'listening');
++const port = reservation.address().port; await new Promise(r => reservation.close(r));
++const origin = `http://127.0.0.1:${port}`;
++const server = spawn(process.execPath, [resolve(root, 'node_modules/next/dist/bin/next'), 'start', '--hostname', '127.0.0.1', '--port', String(port)], {
++  cwd: root, stdio: 'ignore', windowsHide: true,
++  env: { ...process.env, NEXT_TELEMETRY_DISABLED: '1', NEXT_PUBLIC_ACIA_API_URL: 'https://api.example.test' },
++});
++const pdfPath = '/papers/gobernanza-ia-infraestructura-economica-mpra-131077.pdf';
++const expectedHash = 'd061b9cd2ddc90e391181e164f4dacb057e7996d9a9cf88d9a2ef10486307aa4';
++const digest = bytes => createHash('sha256').update(bytes).digest('hex');
++let browser;
++try {
++  let ready = false;
++  for (let i = 0; i < 60; i++) {
++    assert.equal(server.exitCode, null);
++    try { if ((await fetch(origin + '/papers')).status === 200) { ready = true; break; } } catch {}
++    await new Promise(r => setTimeout(r, 250));
++  }
++  assert(ready, 'Owned Next server did not start');
++  const direct = await fetch(origin + pdfPath);
++  assert.equal(direct.status, 200); assert.match(direct.headers.get('content-type'), /application\/pdf/);
++  assert.equal(digest(Buffer.from(await direct.arrayBuffer())), expectedHash);
++  const partial = await fetch(origin + pdfPath, { headers: { Range: 'bytes=0-31' } });
++  assert.equal(partial.status, 206); assert.equal((await partial.arrayBuffer()).byteLength, 32);
++
++  browser = await chromium.launch({ executablePath: process.env.ACIA_MAIL_CHROMIUM_PATH, headless: true });
++  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
++  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin });
++  const methods = [];
++  await context.route('**/*', route => {
++    const request = route.request(); methods.push(request.method());
++    return new URL(request.url()).origin === origin ? route.continue() : route.abort();
++  });
++  const page = await context.newPage();
++  const errors = []; page.on('pageerror', error => errors.push(error.message));
++  await page.goto(origin + '/papers');
++  await page.getByRole('heading', { name: /^Gobernanza de la IA como infraestructura/ }).waitFor();
++  assert.equal(await page.getByText('Aún no hay publicaciones cargadas.', { exact: false }).count(), 0);
++  assert.equal(await page.locator('article[aria-labelledby^="paper-"]').count(), 1);
++  assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'), 'https://www.iaencolombia.org/papers');
++  assert.equal(await page.locator('meta[property="og:title"]').getAttribute('content'), await page.getByRole('heading', { name: /^Gobernanza de la IA como infraestructura/ }).textContent());
++  await page.locator('figure img').evaluate(async img => { if (!img.complete) await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; }); if (!img.naturalWidth) throw new Error('Cover did not load'); });
++  await page.screenshot({ path: join(output, 'papers-desktop.png'), fullPage: true });
++  await page.locator('article[aria-labelledby^="paper-"]').screenshot({ path: join(output, 'paper-desktop.png') });
++  // Neutral review captures before clipboard selection/focus alters the UI.
++  for (const width of [1440, 390]) {
++    await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });
++    await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); });
++    await page.evaluate(() => document.fonts.ready);
++    const suffix = width === 1440 ? 'desktop' : 'mobile';
++    await page.screenshot({ path: join(output, `papers-${suffix}.png`), fullPage: true });
++    const bounds = await page.locator('article[aria-labelledby^="paper-"]').boundingBox();
++    const cdp = await context.newCDPSession(page);
++    const capture = await cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: { ...bounds, scale: 1 } });
++    await writeFile(join(output, `paper-${suffix}.png`), Buffer.from(capture.data, 'base64'));
++    await cdp.detach();
++  }
++  await page.setViewportSize({ width: 1440, height: 1000 });
++  const read = page.getByRole('link', { name: 'Leer PDF (abre una pestaña nueva)', exact: true });
++  assert.equal(await read.getAttribute('href'), pdfPath); assert.equal(await read.getAttribute('target'), '_blank');
++  assert.equal(await page.getByRole('link', { name: /^Ver publicación en MPRA/ }).getAttribute('href'), 'https://mpra.ub.uni-muenchen.de/131077/');
++  await page.getByRole('button', { name: 'Copiar referencia' }).click();
++  await page.getByRole('status').filter({ hasText: 'Referencia copiada.' }).waitFor();
++  const citation = await page.getByRole('textbox', { name: 'Referencia bibliográfica' }).inputValue();
++  assert.equal(await page.evaluate(() => navigator.clipboard.readText()), citation);
++  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('link', { name: 'Descargar PDF', exact: true }).click()]);
++  const downloadFile = join(root, '.local-review/paper-download.pdf');
++  await download.saveAs(downloadFile); assert.equal(digest(await readFile(downloadFile)), expectedHash);
++  assert.equal(download.suggestedFilename(), pdfPath.split('/').at(-1));
++  await page.getByRole('button', { name: 'Copiar referencia' }).focus(); await page.keyboard.press('Enter');
++  assert.equal(await page.getByRole('button', { name: 'Copiar referencia' }).evaluate(el => getComputedStyle(el).outlineStyle), 'solid');
++  // Force only the optional browser clipboard API to be unavailable: verify the existing text fallback.
++  await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined }));
++  await page.getByRole('button', { name: 'Copiar referencia' }).click();
++  await page.getByRole('status').filter({ hasText: 'Referencia seleccionada.' }).waitFor();
++  assert.equal(await page.getByRole('textbox', { name: 'Referencia bibliográfica' }).evaluate(el => el.selectionEnd - el.selectionStart), citation.length);
++  for (const width of [390, 320]) {
++    await page.setViewportSize({ width, height: 844 });
++    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Horizontal overflow at ${width}`);
++  }
++  assert.deepEqual(errors, []); assert(methods.every(method => method === 'GET' || method === 'HEAD'));
++  await writeFile(join(output, 'validation.json'), JSON.stringify({ scope: 'local production-built Next; no auth; external browser network blocked', desktop: '1440x1000 PASS', mobile: '390x844 and 320x844 PASS; no horizontal overflow', direct_pdf: '200 application/pdf; original SHA256 matches', range_pdf: '206 PASS', browser_download: 'PASS; original filename and SHA256 match', citation_copy: 'PASS; actual clipboard', clipboard_fallback: 'PASS; full text selected', keyboard_focus: 'PASS', console_errors: 0, business_writes: false, smtp_used: false }, null, 2) + '\n');
++  console.log('PAPERS_BROWSER=PASS; PDF_DOWNLOAD_ORIGINAL_BYTES=PASS; BUSINESS_WRITES=false; SMTP_USED=false');
++} finally {
++  if (browser) await browser.close();
++  if (server.exitCode === null) { const exited = once(server, 'exit'); server.kill('SIGTERM'); await exited; }
++  const open = await new Promise(r => { const socket = connect({ host: '127.0.0.1', port }); socket.once('connect', () => { socket.destroy(); r(true); }); socket.once('error', () => r(false)); });
++  assert.equal(open, false, 'Owned server port remains open');
++  console.log('PAPERS_BROWSER_CLEANUP=PASS');
++}

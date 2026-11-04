@@ -1,0 +1,14 @@
+{
+  "scope": "local production-built Next; no auth; external browser network blocked",
+  "desktop": "1440x1000 PASS",
+  "mobile": "390x844 and 320x844 PASS; no horizontal overflow",
+  "direct_pdf": "200 application/pdf; original SHA256 matches",
+  "range_pdf": "206 PASS",
+  "browser_download": "PASS; original filename and SHA256 match",
+  "citation_copy": "PASS; actual clipboard",
+  "clipboard_fallback": "PASS; full text selected",
+  "keyboard_focus": "PASS",
+  "console_errors": 0,
+  "business_writes": false,
+  "smtp_used": false
+}

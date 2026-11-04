@@ -1,15 +1,35 @@
 import type { Metadata } from "next";
 import { EmptyState, PublicPage } from "@/components/layout/PublicPage";
 import { PUBLICATIONS, PUBLICATION_TYPES } from "@/data/papers";
+import { PublicationCard } from "@/components/papers/PublicationCard";
 
 export const metadata: Metadata = {
   title: "Papers y publicaciones ACIA",
   description: "Repositorio institucional de investigación, análisis técnico y documentos de política pública de ACIA.",
+  alternates: { canonical: "https://www.iaencolombia.org/papers" },
+  openGraph: {
+    type: "website",
+    title: PUBLICATIONS[0]?.title ?? "Papers y publicaciones ACIA",
+    description: PUBLICATIONS[0]?.abstract ?? "Publicaciones de ACIA.",
+    url: "https://www.iaencolombia.org/papers",
+    siteName: "ACIA",
+    locale: "es_CO",
+    images: [{ url: "https://www.iaencolombia.org/papers/gobernanza-ia-infraestructura-economica-portada.png", alt: "Portada original del paper de ACIA" }],
+  },
+  twitter: {
+    card: "summary",
+    title: PUBLICATIONS[0]?.title ?? "Papers y publicaciones ACIA",
+    description: "Gobernanza de IA, riesgos sistémicos y confianza en los mercados. Paper de ACIA disponible en MPRA.",
+    images: ["https://www.iaencolombia.org/papers/gobernanza-ia-infraestructura-economica-portada.png"],
+  },
 };
 
 export default function PapersPage() {
   return (
     <PublicPage eyebrow="Conocimiento ACIA" title="Papers y publicaciones ACIA" description="Repositorio institucional para investigación, análisis técnico y documentos orientados a fortalecer las decisiones sobre inteligencia artificial.">
+      {PUBLICATIONS.length > 0 && <section aria-label="Publicaciones de ACIA" className="mb-14 space-y-8">
+        {PUBLICATIONS.map(publication => <PublicationCard key={publication.slug} publication={publication} />)}
+      </section>}
       <section aria-labelledby="publication-types-title">
         <h2 id="publication-types-title" className="text-2xl font-extrabold text-primary sm:text-3xl">Colecciones editoriales</h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
