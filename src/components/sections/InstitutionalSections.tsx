@@ -50,7 +50,7 @@ export function KnowledgeSection() {
               Observatorio <span>En desarrollo ↗</span>
             </a>
             <a href={ACIA_PAPERS_URL}>
-              Papers <span>En preparación ↗</span>
+              Papers <span>Ver publicaciones ↗</span>
             </a>
           </div>
         </div>
