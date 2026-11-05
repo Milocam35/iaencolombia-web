@@ -51,7 +51,12 @@ try {
   await page.goto(origin + '/papers');
   await page.getByRole('heading', { name: /^Gobernanza de la IA como infraestructura/ }).waitFor();
   assert.equal(await page.getByText('Aún no hay publicaciones cargadas.', { exact: false }).count(), 0);
-  assert.equal(await page.locator('article[aria-labelledby^="paper-"]').count(), 1);
+  assert.equal(await page.locator('#research-papers article[aria-labelledby^="paper-"]').count(), 1);
+  await page.getByRole('link', { name: 'Research Papers', exact: true }).click();
+  assert.equal(new URL(page.url()).hash, '#research-papers');
+  assert(await page.getByRole('heading', { name: 'Research Papers', level: 2 }).isVisible());
+  assert(await page.getByText('ACIA-RP-2026-001', { exact: true }).isVisible());
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'), 'https://www.iaencolombia.org/papers');
   assert.equal(await page.locator('meta[property="og:title"]').getAttribute('content'), await page.getByRole('heading', { name: /^Gobernanza de la IA como infraestructura/ }).textContent());
   await page.locator('figure img').evaluate(async img => { if (!img.complete) await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; }); if (!img.naturalWidth) throw new Error('Cover did not load'); });
@@ -94,7 +99,7 @@ try {
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Horizontal overflow at ${width}`);
   }
   assert.deepEqual(errors, []); assert(methods.every(method => method === 'GET' || method === 'HEAD'));
-  await writeFile(join(output, 'validation.json'), JSON.stringify({ scope: 'local production-built Next; no auth; external browser network blocked', desktop: '1440x1000 PASS', mobile: '390x844 and 320x844 PASS; no horizontal overflow', direct_pdf: '200 application/pdf; original SHA256 matches', range_pdf: '206 PASS', browser_download: 'PASS; original filename and SHA256 match', citation_copy: 'PASS; actual clipboard', clipboard_fallback: 'PASS; full text selected', keyboard_focus: 'PASS', console_errors: 0, business_writes: false, smtp_used: false }, null, 2) + '\n');
+  await writeFile(join(output, 'validation.json'), JSON.stringify({ scope: 'local production-built Next; no auth; external browser network blocked', desktop: '1440x1000 PASS', mobile: '390x844 and 320x844 PASS; no horizontal overflow', direct_pdf: '200 application/pdf; original SHA256 matches', range_pdf: '206 PASS', browser_download: 'PASS; original filename and SHA256 match', collection: 'Research Papers; anchor and single grouped article PASS', institutional_identifier: 'ACIA-RP-2026-001; distinct from MPRA 131077', citation_copy: 'PASS; actual clipboard', clipboard_fallback: 'PASS; full text selected', keyboard_focus: 'PASS', console_errors: 0, business_writes: false, smtp_used: false }, null, 2) + '\n');
   console.log('PAPERS_BROWSER=PASS; PDF_DOWNLOAD_ORIGINAL_BYTES=PASS; BUSINESS_WRITES=false; SMTP_USED=false');
 } finally {
   if (browser) await browser.close();

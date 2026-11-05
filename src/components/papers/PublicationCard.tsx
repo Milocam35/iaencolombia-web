@@ -13,10 +13,11 @@ export function PublicationCard({ publication }: { publication: AciaPublication 
     <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-12 lg:p-10">
       <div className="min-w-0">
         <p className="font-mono text-xs font-bold leading-6 tracking-wide text-primary">{publication.publicationType ?? "Paper de ACIA"} · Disponible en MPRA</p>
-        <h2 id={titleId} className="mt-4 text-2xl font-extrabold leading-snug tracking-tight text-primary sm:text-3xl">{publication.title}</h2>
+        <h3 id={titleId} className="mt-4 text-2xl font-extrabold leading-snug tracking-tight text-primary sm:text-3xl">{publication.title}</h3>
         <p className="mt-5 text-sm font-semibold leading-7 text-foreground">{publication.authors.join(" · ")}</p>
         <p className="mt-1 text-sm leading-7 text-muted-foreground">{publication.institution}</p>
         <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-4 text-sm">
+          {publication.aciaIdentifier && <div><dt className="text-xs font-semibold text-muted-foreground">Identificador ACIA</dt><dd className="mt-1 font-mono font-semibold text-primary">{publication.aciaIdentifier}</dd></div>}
           <div><dt className="text-xs font-semibold text-muted-foreground">Año</dt><dd className="mt-1 font-semibold text-primary">{publication.year}</dd></div>
           <div><dt className="text-xs font-semibold text-muted-foreground">Idioma</dt><dd className="mt-1 text-foreground">{publication.language}</dd></div>
           <div><dt className="text-xs font-semibold text-muted-foreground">Depósito en MPRA</dt><dd className="mt-1 text-foreground"><time dateTime={publication.depositedAt}>{depositDate(publication.depositedAt)}</time></dd></div>

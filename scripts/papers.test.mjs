@@ -40,7 +40,10 @@ test('el primer paper conserva autoría interna y depósito, sin datos editorial
   assert.equal(paper.depositedAt, '2026-09-30');
   assert.equal(paper.language, 'Español');
   assert.equal(paper.repository.identifier, 'MPRA Paper n.º 131077');
-  for (const key of ['publicationType', 'aciaIdentifier', 'version', 'license', 'reviewStatus', 'publicationDate']) assert.equal(paper[key], undefined);
+  assert.equal(paper.publicationType, 'Research Paper');
+  assert.equal(paper.aciaIdentifier, 'ACIA-RP-2026-001');
+  assert.match(paper.aciaIdentifier, /^ACIA-RP-2026-\d{3}$/);
+  for (const key of ['version', 'license', 'reviewStatus', 'publicationDate']) assert.equal(paper[key], undefined);
   assert.equal(new Set(PUBLICATIONS.map(item => item.slug)).size, PUBLICATIONS.length);
   assert.equal(new Set(PUBLICATIONS.map(item => item.repository.url)).size, PUBLICATIONS.length);
 });
@@ -55,7 +58,7 @@ test('la copia pública conserva todos los bytes del PDF original de MPRA', () =
 
 test('ficha pública ofrece lectura, descarga real en el mismo origen y registro externo seguro', () => {
   const html = renderToStaticMarkup(React.createElement(PublicationCard, { publication: paper }));
-  assert.match(html, /Paper de ACIA.*Disponible en MPRA/);
+  assert.match(html, /Research Paper.*Disponible en MPRA/);
   assert.match(html, /Depósito en MPRA/);
   assert.match(html, /<time dateTime="2026-09-30">30 de septiembre de 2026<\/time>/);
   assert.match(html, /href="\/papers\/gobernanza-ia-infraestructura-economica-mpra-131077.pdf" download=""/);
@@ -70,6 +73,7 @@ test('ficha pública ofrece lectura, descarga real en el mismo origen y registro
 test('la referencia es seleccionable sin JavaScript y el botón ofrece fallback de portapapeles', () => {
   const html = renderToStaticMarkup(React.createElement(citation.PublicationCitation, { citation: paper.citation }));
   assert.match(html, /<textarea[^>]*readOnly/);
+  assert.match(html, /ACIA-RP-2026-001/);
   assert.match(html, /MPRA Paper n.º 131077/);
   assert.match(html, /Copiar referencia/);
   assert.match(html, /role="status"/);
@@ -81,6 +85,10 @@ test('papers renderiza la publicación una sola vez y conserva las cuatro colecc
   assert.equal((html.match(/<article aria-labelledby="paper-/g) ?? []).length, 1);
   assert.doesNotMatch(html, /Repositorio institucional en preparación|Aún no hay publicaciones cargadas/);
   for (const type of PUBLICATION_TYPES) assert(html.includes(`${type.label}s`));
+  assert.match(html, /href="#research-papers"/);
+  assert.match(html, /id="research-papers"[\s\S]*<h2[^>]*>Research Papers<\/h2>[\s\S]*<article aria-labelledby="paper-/);
+  assert.match(html, /1 publicación/);
+  assert.equal(new Set(PUBLICATIONS.map(item => item.aciaIdentifier).filter(Boolean)).size, PUBLICATIONS.filter(item => item.aciaIdentifier).length);
 });
 
 test('SEO público describe el paper sin fecha de despliegue ni DOI, licencia o revisión ficticios', () => {

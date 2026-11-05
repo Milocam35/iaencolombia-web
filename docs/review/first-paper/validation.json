@@ -5,6 +5,8 @@
   "direct_pdf": "200 application/pdf; original SHA256 matches",
   "range_pdf": "206 PASS",
   "browser_download": "PASS; original filename and SHA256 match",
+  "collection": "Research Papers; anchor and single grouped article PASS",
+  "institutional_identifier": "ACIA-RP-2026-001; distinct from MPRA 131077",
   "citation_copy": "PASS; actual clipboard",
   "clipboard_fallback": "PASS; full text selected",
   "keyboard_focus": "PASS",

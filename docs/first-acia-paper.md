@@ -6,7 +6,7 @@ Implementación en el repositorio `Milocam35/iaencolombia-web`, desde `origin/ma
 
 La ruta pública existente `/papers` usa `src/data/papers.ts`: contenido versionado, sin API ni gestión Admin asociada a esta sección. Se conserva ese mecanismo; no hay CMS, migración ni cambios de backend. Una única entrada estable por slug y registro MPRA; compilar o desplegar de nuevo no inserta registros ni dispara campañas. No se modifican pagos, afiliación, Mi ACIA o automatizaciones de correo.
 
-Se mantiene PublicPage, Header, Footer, las cuatro colecciones y la navegación. La ficha real sustituye el estado vacío. Se actualiza únicamente el enlace de Papers de la sección Conocimiento del inicio, de “En preparación” a “Ver publicaciones”.
+Se mantiene PublicPage, Header, Footer, las cuatro colecciones y la navegación. La ficha real sustituye el estado vacío, dentro de la sección Research Papers. La tarjeta de la colección indica una publicación y enlaza a esa sección; las otras tres colecciones conservan su lugar y muestran cero. Se actualiza únicamente el enlace de Papers de la sección Conocimiento del inicio, de “En preparación” a “Ver publicaciones”.
 
 ## Fuentes y decisión editorial
 
@@ -17,7 +17,8 @@ Verificadas el 4 de noviembre de 2026:
 - PDF: 22 páginas, 1.137.472 bytes. Portada externa (página 1): título en inglés, autores “Varela, Angel and Cortez, Juan and Colmenares, Alejandro”, fecha 17 June 2026 y depósito 30 Sep 2026 06:17 UTC.
 - Portada interna (página 2): “Septiembre 29 de 2026”; Angel Varela, Alejandro Colmenares, Juan Camilo Cortes, en ese orden. La página 3 contiene el título español completo y repite ese orden de autores. Su abstract respalda el resumen suministrado por ACIA.
 - Se usa la autoría interna en ficha y cita. Se conserva el título completo proporcionado, confirmado en la página 3 y el registro. La web muestra solamente año 2026 y “Depósito en MPRA: 30 de septiembre de 2026”; no se atribuye fecha del despliegue al documento ni se elige una de las dos fechas de portada como fecha original de publicación.
-- Las reglas existentes enumeran Research Paper, Working Paper, Policy Brief y Technical Note y sus formatos de identificación, pero no asignan una colección a este documento. Se presenta “Paper de ACIA · Disponible en MPRA”. No se asignan identificador ACIA, DOI, versión, licencia ni revisión por pares; los campos que antes eran obligatorios en una interfaz vacía ahora son opcionales.
+- Tras la revisión, el usuario aprobó expresamente incluir este documento en Research Papers y utilizar el formato institucional existente. Se asigna `ACIA-RP-2026-001`: RP = Research Paper, 2026 = año del documento, 001 = primer consecutivo de esa serie anual. No había otro identificador asignado en el catálogo versionado. El código queda persistido como contenido; no se recalcula ni incrementa al compilar, cambiar el orden o desplegar. El siguiente paper de la misma serie y año deberá usar el siguiente consecutivo disponible, previa revisión del catálogo.
+- El código ACIA identifica la ficha institucional y se muestra también en la referencia copiable. Es independiente de MPRA Paper n.º 131077 y no cambia los bytes ni las portadas del PDF. La clasificación editorial Research Paper no implica revisión por pares. No se asignan DOI, versión, licencia ni estado de revisión.
 - La institución es Asociación Colombiana de Inteligencia Artificial — ACIA. MPRA se presenta como repositorio; no como autor, institución autora ni aval académico.
 
 ## Archivos y preservación
@@ -66,3 +67,7 @@ Capturas: `docs/review/first-paper/index.html`; evidencia estructurada: `validat
 6. Registrar SHA fusionado y despliegue. Si hubiera un defecto de ficha, preparar una corrección conservando la URL y bytes del PDF ya compartido; evitar borrar o renombrar el archivo público.
 
 Estado de esta entrega: preparada para revisión, sin merge ni despliegue productivo. No se ejecuta ninguno de estos pasos contra producción.
+
+## Revisión de colección e identificador
+
+Cambio solicitado después del primer Draft: Research Papers con código ACIA-RP-2026-001. Se actualizan únicamente clasificación, agrupación de la página, identificador en ficha y cita, pruebas focales y capturas. Se mantienen intactos el PDF, autoría, fechas, resumen, URLs y metadatos sociales. No se repiten las suites locales ajenas al cambio; CI valida el HEAD actualizado del mismo Draft PR.
