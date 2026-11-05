@@ -1,0 +1,20 @@
+{
+  "app": "web",
+  "routes": [
+    "/papers",
+    "/normatividad",
+    "/comunicados",
+    "/politica-tratamiento-datos",
+    "/missing-credit-review-page"
+  ],
+  "signature_count": 1,
+  "reference": "https://fonomia.com/",
+  "destination": "https://www.kpichat.ai",
+  "desktop_and_mobile": "1440/390/320 PASS",
+  "local_logo_original_bytes": "PASS",
+  "keyboard_focus": "PASS",
+  "hidden_during_modal": "PASS",
+  "authentication": "no login or token injection",
+  "external_browser_requests_blocked": [],
+  "business_writes": false
+}

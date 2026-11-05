@@ -1,0 +1,32 @@
+.kpichat-signature {
+  position: fixed;
+  left: 18px;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 6px 9px;
+  border: 1px solid rgba(86,115,153,.13);
+  border-radius: 999px;
+  background: rgba(255,255,255,.68);
+  color: rgba(96,112,137,.88);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: 0;
+  box-shadow: 0 10px 24px rgba(29,57,95,.08);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.kpichat-signature a { display: inline-flex; align-items: center; min-height: 18px; }
+.kpichat-signature a:focus-visible { outline: 2px solid #1f84fb; outline-offset: 4px; border-radius: 2px; }
+.kpichat-signature-logo { width: auto; height: 16px; display: block; }
+.kpichat-signature:hover { background: rgba(255,255,255,.86); border-color: rgba(31,132,251,.18); }
+/* Keep the global credit outside dialog focus traps and below navigation overlays. */
+body:has(dialog[open], [aria-modal="true"]) .kpichat-signature { visibility: hidden; }
+@media (max-width: 560px) {
+  .kpichat-signature { left: 10px; bottom: max(64px, env(safe-area-inset-bottom)); padding: 5px 8px; }
+  .kpichat-signature-logo { height: 14px; }
+}

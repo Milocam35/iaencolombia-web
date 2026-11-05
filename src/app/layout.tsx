@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { KpiChatSignature } from "@/components/layout/KpiChatSignature";
 import "./public-experience.css";
 import "./opcion3.css";
 
@@ -73,6 +74,7 @@ export default function RootLayout({
       >
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema).replace(/</g, "\\u003c") }} />
         {children}
+        <KpiChatSignature />
       </body>
     </html>
   );
