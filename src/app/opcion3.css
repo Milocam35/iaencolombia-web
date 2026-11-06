@@ -407,6 +407,77 @@
   object-fit: contain;
   background: #f5f8fb;
 }
+.op3-universe .op3-universe-video {
+  aspect-ratio: 16 / 9;
+  margin-bottom: 0;
+  background: #080820;
+}
+.op3-universe-video iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.op3-universe-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  color: white;
+  background: linear-gradient(180deg, #05274712, #052747a6);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  border: 0;
+  cursor: pointer;
+}
+.op3-universe-play:hover {
+  background: linear-gradient(180deg, #0527472e, #052747bf);
+}
+.op3-universe-play:focus-visible,
+.op3-universe-video iframe:focus-visible {
+  outline: 3px solid #8ee3ff;
+  outline-offset: -5px;
+}
+.op3-universe-video figcaption {
+  pointer-events: none;
+}
+.op3-universe-play-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #4ec7f0;
+  color: #052747;
+  border: 2px solid white;
+}
+.op3-universe-play-icon svg {
+  width: 30px;
+  height: 30px;
+}
+.op3-universe-video-link {
+  margin-top: 8px;
+  text-align: right;
+  font-size: 11px;
+  line-height: 1.8;
+  color: #d5e6f7;
+}
+.op3-universe-video-link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  gap: 5px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.op3-universe-video-link a:hover {
+  color: white;
+}
 .op3-universe-photo figcaption,
 .op3-institutional-photo figcaption {
   position: absolute;
