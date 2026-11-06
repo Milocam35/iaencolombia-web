@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { MEMBER_PORTAL_URL } from "@/lib/config";
 import { EditorialIcon } from "@/components/ui/EditorialIcon";
 import { UNIVERSE_PREVIEW } from "@/data/publicExperience";
+import { UniverseVideo } from "./UniverseVideo";
 export function UniverseSection() {
   const ready =
     UNIVERSE_PREVIEW.approved && UNIVERSE_PREVIEW.src && UNIVERSE_PREVIEW.alt;
@@ -12,19 +12,17 @@ export function UniverseSection() {
         <h2>Universo ACIA</h2>
         <p>El punto de encuentro de nuestros afiliados.</p>
       </div>
-      <figure className={ready ? "op3-universe-product" : "op3-universe-photo"}>
-        <Image
-          src={ready ? UNIVERSE_PREVIEW.src : "/images/opcion3/conexiones.webp"}
-          alt={
-            ready
-              ? UNIVERSE_PREVIEW.alt
-              : "Escena ilustrativa de una conversación profesional; no es una captura de Universo ACIA."
-          }
-          fill
-          sizes="(min-width: 1280px) 440px, (min-width: 768px) 50vw, 100vw"
-        />
-        {!ready && <figcaption>Imagen ilustrativa</figcaption>}
-      </figure>
+      <UniverseVideo
+        posterSrc={
+          ready ? UNIVERSE_PREVIEW.src : "/images/opcion3/conexiones.webp"
+        }
+        posterAlt={
+          ready
+            ? UNIVERSE_PREVIEW.alt
+            : "Escena ilustrativa de una conversación profesional; no es una captura de Universo ACIA."
+        }
+        illustrative={!ready}
+      />
       <ul className="op3-universe-capabilities">
         <li>
           <EditorialIcon name="person" />
