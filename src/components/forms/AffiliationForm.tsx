@@ -1,6 +1,6 @@
 "use client";
 
-import { COMMUNITY_CONSENT, COMMUNITY_CONSENT_VERSION, communityRegistrationMessage } from '@/lib/community';
+import { COMMUNITY_CONSENT, COMMUNITY_CONSENT_VERSION, COMMUNITY_HELP, COMMUNITY_REQUIREMENT, communityRegistrationMessage } from '@/lib/community';
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
@@ -137,6 +137,7 @@ export function AffiliationForm({
   });
   const [paymentSessionChecked, setPaymentSessionChecked] =
     useState(!paymentsEnabled);
+  const [communityFormValid, setCommunityFormValid] = useState(false);
   const submissionInFlight = useRef(false);
   const feedbackRef = useRef<HTMLDivElement>(null);
 
@@ -329,9 +330,10 @@ export function AffiliationForm({
     setFeedback({
       kind: "success",
       message:
-        submittedPlan.id === 'comunidad' ? communityRegistrationMessage(Boolean(payload.communications_consent)) : "Hemos recibido tu interés en vincularte a ACIA. Te contactaremos al correo registrado para continuar el proceso.",
+        submittedPlan.id === 'comunidad' ? communityRegistrationMessage() : "Hemos recibido tu interés en vincularte a ACIA. Te contactaremos al correo registrado para continuar el proceso.",
     });
     formElement.reset();
+    setCommunityFormValid(false);
     setPlanCode("");
     setPhase("idle");
     submissionInFlight.current = false;
@@ -431,6 +433,11 @@ export function AffiliationForm({
   return (
     <form
       onSubmit={submit}
+      onChange={event => {
+        const form = event.currentTarget;
+        // Re-evaluate after a plan change has mounted/unmounted its required fields.
+        queueMicrotask(() => { if (form.isConnected) setCommunityFormValid(form.checkValidity()); });
+      }}
       className="min-w-0 rounded-3xl border border-border bg-white p-6 shadow-2xl shadow-primary/[0.07] sm:p-9"
     >
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
@@ -693,8 +700,10 @@ export function AffiliationForm({
                 {AFFILIATION_CONSENT.suffix} <Required />
               </span>
             </label>
-            {planCode === 'comunidad' && <div className="mt-4 border-t border-border pt-4"><label className="flex cursor-pointer items-start gap-3 rounded-xl bg-surface p-4 text-sm leading-6 text-muted-foreground"><input name="communications_consent" type="checkbox" className="mt-1 size-4 shrink-0 accent-primary" /><span>{COMMUNITY_CONSENT}</span></label><p className="mt-3 text-sm text-muted-foreground">Es opcional. Puedes registrarte sin suscribirte. <Link href="/comunidad/preferencias" className="font-semibold text-primary underline">Gestionar mi suscripción o darme de baja</Link></p></div>}
+            {planCode === 'comunidad' && <div className="mt-4 border-t border-border pt-4"><label className="flex cursor-pointer items-start gap-3 rounded-xl bg-surface p-4 text-sm leading-6 text-muted-foreground"><input name="communications_consent" type="checkbox" required aria-describedby="community-help community-requirement" className="mt-1 size-4 shrink-0 accent-primary" /><span>{COMMUNITY_CONSENT}</span></label><p id="community-help" className="mt-3 text-sm text-muted-foreground">{COMMUNITY_HELP} <Link href="/comunidad/preferencias" className="font-semibold text-primary underline">Gestionar mi suscripción o darme de baja</Link></p></div>}
           </fieldset>
+
+          {planCode === 'comunidad' && <p id="community-requirement" role="note" className="mt-5 text-sm leading-6 text-muted-foreground">{COMMUNITY_REQUIREMENT}</p>}
 
           <div
             ref={feedbackRef}
@@ -719,8 +728,10 @@ export function AffiliationForm({
           ) : (
             <button
               type="submit"
+              aria-describedby={planCode === 'comunidad' ? 'community-requirement' : undefined}
               disabled={
                 busy ||
+                (planCode === 'comunidad' && !communityFormValid) ||
                 submissionAction === "select_plan" ||
                 submissionAction === "payment_unavailable"
               }
@@ -737,7 +748,7 @@ export function AffiliationForm({
           )}
 
           <p className="mt-4 text-center text-xs text-muted-foreground">
-            Solo usaremos estos datos para atender tu interés de vinculación.
+            {planCode === 'comunidad' ? 'Usaremos tus datos para gestionar tu suscripción gratuita y las comunicaciones que autorizas.' : 'Solo usaremos estos datos para atender tu interés de vinculación.'}
           </p>
         </>
       )}
@@ -884,7 +895,7 @@ function PlanSummary({
         {onlinePayment
           ? "Al continuar, se abrirá la pasarela segura de Bold. Completa el pago para continuar tu afiliación."
           : plan.paymentKind === "free"
-            ? "Este plan no requiere pago. ACIA continuará el proceso después de recibir tu solicitud."
+            ? "Comunidad es una suscripción gratuita a newsletters y comunicaciones de ACIA. No requiere pago."
             : plan.paymentKind === "negotiated"
               ? "Envía tu solicitud y nuestro equipo te contactará para coordinar la afiliación y el pago de este plan a medida."
               : PAYMENT_UNAVAILABLE_MESSAGE}
@@ -932,7 +943,7 @@ function getSubmitLabel({
   if (submissionAction === "payment_unavailable")
     return "Pago en línea no disponible";
   if (submissionAction === "request" && selectedPlan?.paymentKind === "free") {
-    return "Afiliarme gratis";
+    return "Unirme a Comunidad";
   }
   if (submissionAction === "request") {
     return "Enviar solicitud de afiliación";

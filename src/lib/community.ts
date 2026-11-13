@@ -1,12 +1,12 @@
 import { ACIA_API_URL } from '@/lib/config';
-export const COMMUNITY_CONSENT_VERSION = 'community-communications-2026-10-22';
+export const COMMUNITY_CONSENT_VERSION = 'community-communications-2026-11-13';
 
-export const COMMUNITY_CONSENT = 'Autorizo voluntariamente recibir comunicaciones y newsletters de ACIA por correo electrónico. Puedo darme de baja cuando quiera. Esta autorización no concede acceso a Mi ACIA ni otros beneficios privados.';
+export const COMMUNITY_CONSENT = 'Quiero unirme a Comunidad ACIA y recibir por correo sus newsletters y comunicaciones sobre noticias, actividades, eventos, formación y oportunidades. Puedo darme de baja en cualquier momento.';
+export const COMMUNITY_HELP = 'Comunidad es una suscripción gratuita a las comunicaciones de ACIA. No incluye acceso a Mi ACIA ni beneficios privados.';
+export const COMMUNITY_REQUIREMENT = 'Para unirte a Comunidad, completa los campos obligatorios y marca por separado privacidad y la suscripción a comunicaciones. Una baja o supresión anterior se conserva; volver a suscribirte requiere verificar tu correo.';
 
-export function communityRegistrationMessage(consent: boolean): string {
-  return consent
-    ? 'Hemos recibido tu registro en Comunidad. La suscripción necesita confirmar tu correo; aún no está habilitada para newsletters. Si ya te habías dado de baja, utiliza la opción de volver a suscribirte. Comunidad no incluye acceso a Mi ACIA.'
-    : 'Hemos recibido tu registro en Comunidad. No has autorizado newsletters. El registro no incluye acceso a Mi ACIA ni otros beneficios privados.';
+export function communityRegistrationMessage(): string {
+  return 'Recibimos tu registro y autorización de newsletters y comunicaciones de ACIA. No necesitas confirmar por correo para una nueva suscripción. Si esta dirección tenía una baja o supresión, se conserva: utiliza la opción de volver a suscribirte cuando corresponda. Comunidad no incluye acceso a Mi ACIA ni beneficios privados.';
 }
 
 export function takeCommunityToken(): string | null {
