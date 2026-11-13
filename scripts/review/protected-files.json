@@ -3,7 +3,7 @@
   "normalization": "LF; solo correo general info -> contacto en AffiliationForm y affiliationPayments",
   "files": {
     "src/lib/config.ts": "77d7cc0ccffd9cafed6e1e42cc91609e4739e053f8528416af61803e9ad0928d",
-    "src/lib/membershipPlans.ts": "848ce9b9d2d01a218c62585c55d9b9ae3790d63aa9c257e74edef8eb2bce0e2d",
+    "src/lib/membershipPlans.ts": "e1008e252ec5646d1d376dee364734471b7d0b02f2bebc46e640bd1c5e95fd5b",
     "src/lib/privacyPolicy.ts": "ecd764f1585157eafae55b9f444d06b57875b441d3a0420d69544a44a1304fa4",
     "src/lib/boldCheckout.ts": "9ca5247ba1217149f2074debc38c5c75efc594b0c1bf1af9af533ea8e3af7d48",
     "src/lib/boldCheckoutFlow.ts": "bec68e6e2e5f73ad0ff64c1dee522a02346db534aa8a75fc3c8c25626ba3d46c",
@@ -11,12 +11,12 @@
     "src/lib/paymentResult.ts": "028f82cf64c2bf5855745e91fbc5d0750de64c4a84dd9991b70f40b60d1216cf",
     "src/lib/paymentPolling.ts": "08c6accda4afd8eab8b4561b808ef322cc76b4149490a935a232e95add4ddbe8",
     "src/components/payments/PaymentResult.tsx": "730699b34ea5831474aa3eb14fb393af53be8506f7900e7ce3085bf10a1d8354",
-    "src/lib/community.ts": "8b63c21fabf736a2b528a178ccc26293feee4fc3d6f3f2a7d0931f4d7936f55a",
+    "src/lib/community.ts": "730736d7d1d424df4f504661a587d3d5bbe88aaadb6f85feefda7356420966ae",
     "src/lib/newsletterPreferences.ts": "cbc6f2265578cb26aae4ed8e59fcf0e352475574316d3661e1b26fd7b0486a97",
     "src/lib/newsletters.ts": "17558e491f03004a1180f44151fc2ef9d7fe6eee0dc67cc2b0f7fc5aaf1ec44d",
     "src/components/forms/CommunityPreferences.tsx": "3b286063406f097cfb875183ea0e93ea87474ce8f4935ec20045e6e795f2132d",
     "src/components/newsletter/NewsletterPreferences.tsx": "74b7419bd07e2298882a93547b697dc29ca29098e5a54af0f07eecc5f00c6e9d",
-    "src/components/forms/AffiliationForm.tsx": "c07ba8aa22ac291990c8c2e33759130dc6ed19c3b6fa777bd40f547cc3e865ee",
+    "src/components/forms/AffiliationForm.tsx": "b9307935443b069fff7d3b900e85d917c6ede1be1a8e14ac3840e8858e77f512",
     "src/lib/affiliationPayments.ts": "be5ee7b385af2883bede05ebd98ead40f86a32f4c788f09b70c924868398f97e"
   }
 }
