@@ -115,13 +115,21 @@ test("el reproductor autorizado inicia silenciado, sin autoplay, con controles y
     );
 });
 
-test("el plan privado no aparece en fuentes, contenido ni metadatos públicos", () => {
+test("el plan privado solo se menciona en la frase de política expresamente aprobada", () => {
   const scan = (dir) => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const file = path.join(dir, entry.name);
       if (entry.isDirectory()) scan(file);
-      else if (/\.(tsx?|css)$/.test(file))
-        assert.doesNotMatch(readFileSync(file, "utf8"), /visionarios/i, file);
+      else if (/\.(tsx?|css)$/.test(file)) {
+        let source = readFileSync(file, "utf8");
+        if (path.relative(root, file).split(path.sep).join("/") === "src/lib/privacyPolicy.ts") {
+          // Excepción aprobada el 16-11-2026: solo esta frase, sin publicar el plan.
+          const approved = "Esta autorización no es requisito para solicitar ni mantener afiliaciones de pago, Visionarios u otras vinculaciones.";
+          assert.equal(source.split(approved).length - 1, 1);
+          source = source.replace(approved, "");
+        }
+        assert.doesNotMatch(source, /visionarios/i, file);
+      }
     }
   };
   scan(path.join(root, "src"));
