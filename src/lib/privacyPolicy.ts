@@ -4,6 +4,9 @@ export const PRIVACY_POLICY_EFFECTIVE_DATE = "10 de agosto de 2026";
 // Editorial clarification of the existing communications purpose, not a new
 // form consent/version or a retrospective alteration of consent records.
 export const COMMUNICATIONS_CLARIFICATION_DATE = "1 de noviembre de 2026";
+// Aclaración de Comunidad aprobada por el responsable el 16 de noviembre de 2026.
+// Mantiene los identificadores de privacidad existentes; no reetiqueta consentimientos.
+export const COMMUNITY_SUBSCRIPTION_CLARIFICATION_DATE = "16 de noviembre de 2026";
 export const PRIVACY_POLICY_PATH = "/politica-tratamiento-datos";
 
 export const AFFILIATION_CONSENT = {
@@ -59,7 +62,8 @@ export const PRIVACY_POLICY = {
       title: "Finalidades",
       paragraphs: [
         "Los datos personales podrán ser utilizados para gestionar solicitudes de vinculación o afiliación; contactar a personas interesadas; administrar prospectos y relaciones con potenciales afiliados; gestionar afiliaciones y membresías; administrar la plataforma ACIA; atender solicitudes, consultas y comunicaciones; organizar eventos, webinars, talleres, mesas de trabajo y demás actividades del ecosistema; facilitar conexiones profesionales, académicas, empresariales e institucionales; administrar beneficios de afiliación; mantener registros institucionales y administrativos; gestionar relaciones con aliados, proveedores y contratistas; realizar encuestas, análisis estadísticos y mediciones agregadas para mejorar las actividades de ACIA; prevenir fraude, abuso o incidentes de seguridad; atender obligaciones legales, regulatorias, contables y contractuales; y gestionar pagos y facturación cuando corresponda.",
-        "Las comunicaciones informativas autorizadas incluyen newsletters y mensajes de difusión institucional sobre noticias, actividades, eventos, invitaciones, formación, oportunidades y novedades de ACIA. Esta finalidad comprende a afiliados y miembros de Comunidad/Freemium que hayan autorizado recibir estas comunicaciones. No se exige una autorización adicional por cada mensaje dentro de ese mismo alcance. La suscripción a comunicaciones comerciales o informativas no deberá convertirse en condición obligatoria para presentar una solicitud de afiliación.",
+        "Las comunicaciones informativas autorizadas incluyen newsletters y mensajes de difusión institucional sobre noticias, actividades, eventos, invitaciones, formación, oportunidades y novedades de ACIA. Esta finalidad comprende a afiliados y miembros de Comunidad/Freemium que hayan autorizado recibir estas comunicaciones. No se exige una autorización adicional por cada mensaje dentro de ese mismo alcance.",
+        "Comunidad/Freemium es una suscripción gratuita a newsletters y comunicaciones informativas de ACIA. Su registro requiere autorización expresa mediante una casilla independiente de privacidad y sin premarcar. Esta autorización no es requisito para solicitar ni mantener afiliaciones de pago, Visionarios u otras vinculaciones. Darse de baja de las comunicaciones no modifica esas afiliaciones ni sus beneficios.",
         "Cada correo informativo incluirá enlaces para gestionar las preferencias de recepción y darse de baja de newsletters y difusión institucional. Las bajas y supresiones se respetarán aunque la misma dirección aparezca en varias fuentes. La baja de estas comunicaciones no cancela los servicios de afiliación ni los correos operacionales necesarios, como confirmaciones de pago, acceso o recuperación de contraseña.",
       ],
     },

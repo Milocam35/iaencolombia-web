@@ -1,0 +1,60 @@
+// Local presentation test only. API/transactions have separate real PostgreSQL tests.
+import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
+const { chromium } = await import(process.env.ACIA_PLAYWRIGHT_MODULE ? pathToFileURL(process.env.ACIA_PLAYWRIGHT_MODULE).href : 'playwright');
+const origin=process.env.COMMUNITY_TEST_WEB_ORIGIN || 'http://127.0.0.1:3513';
+assert.equal(new URL(origin).hostname,'127.0.0.1');
+const browser=await chromium.launch({headless:true, ...(process.env.ACIA_CHROMIUM_EXECUTABLE ? {executablePath:process.env.ACIA_CHROMIUM_EXECUTABLE} : {})});
+try {
+ const page=await browser.newPage();
+ const errors=[]; page.on('pageerror',e=>errors.push(e.message));
+ let requests=0;
+ await page.route('**/public/affiliation-prospects',async route=>{
+  requests++;
+  const payload=route.request().postDataJSON();
+  assert.equal(payload.communications_consent,true);
+  assert.equal(payload.privacy_accepted,true);
+  assert.equal(payload.communications_consent_version,'community-communications-2026-11-13');
+  await route.fulfill({status:202,contentType:'application/json',headers:{'Access-Control-Allow-Origin':origin},body:JSON.stringify({status:'received',payment_context:'synthetic-local-capability-for-presentation-only'})});
+ });
+ // Block all nonlocal network access, including third-party embeds.
+ await page.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1' ? route.fallback() : route.abort());
+ await page.goto(origin+'/afiliate?plan=comunidad');
+ const plan=page.locator('select[name="plan_code"]');
+ await plan.selectOption('comunidad');
+ const consent=page.locator('input[name="communications_consent"]');
+ const privacy=page.locator('input[name="privacy_accepted"]');
+ const submit=page.getByRole('button',{name:'Unirme a Comunidad'});
+ assert.equal(await consent.isChecked(),false);
+ assert.equal(await privacy.isChecked(),false);
+ assert.equal(await submit.isDisabled(),true);
+ assert.match(await page.locator('#community-requirement').innerText(),/completa los campos obligatorios/);
+ assert.match(await consent.getAttribute('aria-describedby'),/community-requirement/);
+ await page.locator('input[name="contact_name"]').fill('Persona sintética local');
+ await page.locator('input[name="email"]').fill('synthetic@example.test');
+ await privacy.check();
+ assert.equal(await submit.isDisabled(),true);
+ await consent.focus(); await page.keyboard.press('Space');
+ await page.waitForFunction(()=>!document.querySelector('button[type="submit"]').disabled);
+ await consent.uncheck();
+ await page.waitForFunction(()=>document.querySelector('button[type="submit"]').disabled);
+ await consent.check();
+ await page.locator('input[name="email"]').fill('invalid');
+ await page.waitForFunction(()=>document.querySelector('button[type="submit"]').disabled);
+ await page.locator('input[name="email"]').fill('synthetic@example.test');
+ await page.waitForFunction(()=>!document.querySelector('button[type="submit"]').disabled);
+ await privacy.uncheck();
+ await page.waitForFunction(()=>document.querySelector('button[type="submit"]').disabled);
+ await privacy.check();
+ await page.waitForFunction(()=>!document.querySelector('button[type="submit"]').disabled);
+ await page.setViewportSize({width:390,height:844});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
+ await submit.click();
+ await page.getByText(/Recibimos tu registro y autorización/).waitFor();
+ assert.equal(requests,1);
+ await plan.selectOption('afiliado');
+ assert.equal(await page.locator('input[name="communications_consent"]').count(),0);
+ assert.equal(await page.locator('#community-requirement').count(),0);
+ assert.deepEqual(errors,[]);
+ console.log('COMMUNITY_BROWSER=PASS; checkbox_unchecked=true; required_validity=true; toggle_and_keyboard=true; mobile=true; paid_separate=true; synthetic_requests=1; production_requests=0');
+} finally {await browser.close();}
