@@ -1,5 +1,8 @@
 # Mesas técnicas sectoriales: propuesta pública local
 
+Registro de la etapa visual aprobada en `c7804bc`. La preparación de publicación
+y la resolución del aviso de Next se documentan en `public-sector-tables-release.md`.
+
 Base de la web: `bad97b43b990f5894882ef4560a382c7ef2f6fce` de origin/main,
 repositorio `Milocam35/iaencolombia-web`. Rama local independiente
 `feature/public-sector-tables-preview`. Los otros checkouts y sus revisiones

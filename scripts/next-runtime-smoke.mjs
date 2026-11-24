@@ -29,10 +29,17 @@ try {
   }
   assert(ready,'Local Next did not become ready');
   stage='READ_ONLY_ROUTE_CHECKS';
-  for(const path of ['/afiliate','/afiliate/pago/resultado','/newsletters/preferencias']) {
+  for(const path of ['/afiliate','/afiliate/pago/resultado','/newsletters/preferencias','/mesas-tecnicas-sectoriales']) {
     const response=await fetch(origin+path,{signal:AbortSignal.timeout(10000)});
     assert.equal(response.status,200);
     assert.match(response.headers.get('content-type'),/text\/html/);
+    if(path==='/mesas-tecnicas-sectoriales') {
+      const html=await response.text();
+      assert.equal([...html.matchAll(/<button\b[^>]*\bdata-sector=/g)].length,6);
+      assert.match(html,/Gobernanza y ética de la IA/);
+      assert.match(html,/https:\/\/www\.iaencolombia\.org\/mesas-tecnicas-sectoriales/);
+      assert.doesNotMatch(html,/Propuesta local para revisión visual/);
+    }
   }
   stage='NATIVE_IMAGE_OPTIMIZATION';
   const image=await fetch(origin+'/_next/image?url=%2Fimages%2Fopcion3%2Fhero.webp&w=256&q=75',{

@@ -63,7 +63,9 @@ test("imágenes generadas se guardan localmente optimizadas con procedencia y by
 test("página pública reutiliza encabezado y pie y no consulta endpoints privados", () => {
   const page = read("src/app/mesas-tecnicas-sectoriales/page.tsx");
   assert.match(page, /<PublicPage/);
-  assert.match(page, /robots: \{ index: false, follow: false \}/);
+  assert.match(page, /robots: \{ index: true, follow: true \}/);
+  assert.match(page, /canonical: "https:\/\/www\.iaencolombia\.org\/mesas-tecnicas-sectoriales"/);
+  assert.doesNotMatch(page, /Propuesta local para revisión|generadas para esta propuesta/);
   for (const file of [
     "src/data/sectorTables.ts", "src/components/sections/SectorTablesSection.tsx",
     "src/components/sectorTables/SectorTablesAccordion.tsx", "src/components/sectorTables/SectorTablesCallToAction.tsx",
