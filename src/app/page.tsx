@@ -21,6 +21,7 @@ import { NewslettersSection } from "@/components/sections/NewslettersSection";
 import { PillarsSection } from "@/components/sections/PillarsSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { PRESIDENT_VIDEO } from "@/data/publicExperience";
+import { SectorTablesSection } from "@/components/sections/SectorTablesSection";
 export default function Home() {
   return (
     <>
@@ -34,6 +35,7 @@ export default function Home() {
             <ProfileSelector />
             <UniverseSection />
           </div>
+          <SectorTablesSection />
           <div className="op3-editorial-band">
             <div className="site-container op3-editorial-columns">
               <InstitutionalVideo resource={PRESIDENT_VIDEO} />

@@ -1,0 +1,121 @@
+[
+  {
+    "name": "colaboracion",
+    "origin": "AI-generated illustrative editorial image; built-in image_gen",
+    "source_file": "exec-d7ae06d5-397c-4484-b47c-5372f6927fda.png",
+    "source_sha256": "084434224ff6677ec4e565738718855334c932931cbbbf2776516c2b7dfa22dc",
+    "source_dimensions": [
+      1672,
+      941
+    ],
+    "asset": "public/images/mesas-publicas/colaboracion.webp",
+    "dimensions": [
+      1400,
+      788
+    ],
+    "bytes": 102434,
+    "sha256": "d918c1d7a406f48865a02ed9a25d27259636c418bddae942d4caa6e8ec740a42"
+  },
+  {
+    "name": "estado-justicia-seguridad",
+    "origin": "AI-generated illustrative editorial image; built-in image_gen",
+    "source_file": "exec-bf48a42b-f72b-4d6c-b8fa-25f6ba7ecf49.png",
+    "source_sha256": "50fcadf9d0f17304e99c731e724033b14c4f725b34bb7bbf9743b607b828a439",
+    "source_dimensions": [
+      1536,
+      1024
+    ],
+    "asset": "public/images/mesas-publicas/estado-justicia-seguridad.webp",
+    "dimensions": [
+      1200,
+      800
+    ],
+    "bytes": 184172,
+    "sha256": "8089b83ce9c42fe42ac4520e00d2f182f8a5b1447f64e9715004d1c0a655e34e"
+  },
+  {
+    "name": "economia-industria-productividad",
+    "origin": "AI-generated illustrative editorial image; built-in image_gen",
+    "source_file": "exec-7191e86f-a4ee-4911-a3f3-82d6eece3f73.png",
+    "source_sha256": "a3743c75f58333363c364ff0a8707628bea8df4d2d21715e6a8696a16fbe8944",
+    "source_dimensions": [
+      1536,
+      1024
+    ],
+    "asset": "public/images/mesas-publicas/economia-industria-productividad.webp",
+    "dimensions": [
+      1200,
+      800
+    ],
+    "bytes": 132572,
+    "sha256": "629bb19401727997053753a3174ad0c405d87bd5e73b980cc8a74891bd211adb"
+  },
+  {
+    "name": "desarrollo-humano-social",
+    "origin": "AI-generated illustrative editorial image; built-in image_gen",
+    "source_file": "exec-23ff992d-2d36-4ccd-ad81-8d4d3aca751f.png",
+    "source_sha256": "854f258abe79a3512f6a6ee58d21cd4044472891188174eb3059a87a5094c65a",
+    "source_dimensions": [
+      1536,
+      1024
+    ],
+    "asset": "public/images/mesas-publicas/desarrollo-humano-social.webp",
+    "dimensions": [
+      1200,
+      800
+    ],
+    "bytes": 103072,
+    "sha256": "1774f655f4fc9f1c3c0c5748d7100da2369ad3ddde601e74f40d6de75f934f6a"
+  },
+  {
+    "name": "territorio-infraestructura-sostenibilidad",
+    "origin": "AI-generated illustrative editorial image; built-in image_gen",
+    "source_file": "exec-b5b6a5ca-b61d-4062-9e3b-297739e7212d.png",
+    "source_sha256": "6e947989fd5056d8ed8e66e66ee26a9392e369446e87ce682e372b12a0d54d0c",
+    "source_dimensions": [
+      1536,
+      1024
+    ],
+    "asset": "public/images/mesas-publicas/territorio-infraestructura-sostenibilidad.webp",
+    "dimensions": [
+      1200,
+      800
+    ],
+    "bytes": 347860,
+    "sha256": "3b718ae4d421387cd92cd96a9460fb780c250ac7ea68d94a36a475e7b8d872e9"
+  },
+  {
+    "name": "ciencia-tecnologia-innovacion",
+    "origin": "AI-generated illustrative editorial image; built-in image_gen",
+    "source_file": "exec-0a4b3d9f-ab0b-4017-a7b9-86fc8195e772.png",
+    "source_sha256": "70947ed08c1fca17b31a8e5d17b9b00b4ef3582ec76e4c3921a25e07b11e1751",
+    "source_dimensions": [
+      1536,
+      1024
+    ],
+    "asset": "public/images/mesas-publicas/ciencia-tecnologia-innovacion.webp",
+    "dimensions": [
+      1200,
+      800
+    ],
+    "bytes": 121768,
+    "sha256": "8bd1c014b53da81375b1e1a820c32129327c64f58fd959b3d29589a03296ad47"
+  },
+  {
+    "name": "gobernanza-etica-ia",
+    "origin": "AI-generated illustrative editorial image; built-in image_gen",
+    "source_file": "exec-8b1319f9-acf5-4f6a-b1af-38f622170708.png",
+    "source_sha256": "0f37314f22a4b3a3a807972f7518b8964ce9ad3c406b2d93bffc66c41a438585",
+    "source_dimensions": [
+      1536,
+      1024
+    ],
+    "asset": "public/images/mesas-publicas/gobernanza-etica-ia.webp",
+    "dimensions": [
+      1200,
+      800
+    ],
+    "bytes": 123266,
+    "sha256": "b2af2096c6fd19d31640278adf116661a5276a428abcf7790a6949ed8ef6c14a"
+  }
+]
